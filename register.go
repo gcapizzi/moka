@@ -9,7 +9,7 @@ func New(testingT *testing.T) Register {
 }
 
 func (r Register) Allow(double Double) Subject {
-	return Subject{}
+	return Subject{double: double}
 }
 
 func (r Register) Expect(double Double) Subject {

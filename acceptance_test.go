@@ -25,14 +25,16 @@ type Collaborator interface {
 	Query(string) string
 }
 
-type CollaboratorDouble struct{}
-
-func NewCollaboratorDouble() CollaboratorDouble {
-	return CollaboratorDouble{}
+type CollaboratorDouble struct {
+	moka.Double
 }
 
-func (c CollaboratorDouble) Query(arg string) string {
-	return ""
+func NewCollaboratorDouble() CollaboratorDouble {
+	return CollaboratorDouble{Double: moka.NewConcreteDouble()}
+}
+
+func (d CollaboratorDouble) Query(arg string) string {
+	return d.Call("Query", arg).Get(0).(string)
 }
 
 type Subject struct {
