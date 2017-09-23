@@ -1,9 +1,9 @@
 package moka
 
-type Subject struct {
+type Target struct {
 	double Double
 }
 
-func (s Subject) ToReceive(methodName string) Invocation {
-	return Invocation{double: s.double, methodName: methodName}
+func (t Target) ToReceive(methodName string) Invocation {
+	return Invocation{double: t.double, methodName: methodName}
 }
