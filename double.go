@@ -14,19 +14,15 @@ func NewStrictDouble() StrictDouble {
 }
 
 func (d StrictDouble) Call(methodName string, args ...interface{}) Result {
-	return ConcreteResult{d.stubs[methodName]}
+	return Result{d.stubs[methodName]}
 }
 
 func (d StrictDouble) StubMethod(methodName string, args []interface{}, returnValue interface{}) {
 	d.stubs[methodName] = returnValue
 }
 
-type Result interface {
-	Get(int) interface{}
-}
+type Result []interface{}
 
-type ConcreteResult []interface{}
-
-func (r ConcreteResult) Get(index int) interface{} {
+func (r Result) Get(index int) interface{} {
 	return r[index]
 }
