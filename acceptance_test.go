@@ -4,13 +4,12 @@ import (
 	"testing"
 
 	"github.com/gcapizzi/moka"
+	. "github.com/gcapizzi/moka/syntax"
 )
 
 func TestQueryDelegation(t *testing.T) {
-	m := moka.New(t)
-
 	collaborator := NewCollaboratorDouble()
-	m.Allow(collaborator).ToReceive("Query").With("arg").AndReturn("result")
+	Allow(collaborator).To(Receive("Query").With("arg").AndReturn("result"))
 
 	subject := NewSubject(collaborator)
 
