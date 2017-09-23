@@ -5,19 +5,19 @@ type Double interface {
 	Call(methodName string, args ...interface{}) Result
 }
 
-type ConcreteDouble struct {
+type StrictDouble struct {
 	stubs map[string]interface{}
 }
 
-func NewConcreteDouble() ConcreteDouble {
-	return ConcreteDouble{stubs: make(map[string]interface{})}
+func NewStrictDouble() StrictDouble {
+	return StrictDouble{stubs: make(map[string]interface{})}
 }
 
-func (d ConcreteDouble) Call(methodName string, args ...interface{}) Result {
+func (d StrictDouble) Call(methodName string, args ...interface{}) Result {
 	return ConcreteResult{d.stubs[methodName]}
 }
 
-func (d ConcreteDouble) StubMethod(methodName string, args []interface{}, returnValue interface{}) {
+func (d StrictDouble) StubMethod(methodName string, args []interface{}, returnValue interface{}) {
 	d.stubs[methodName] = returnValue
 }
 

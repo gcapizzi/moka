@@ -33,7 +33,7 @@ type CollaboratorDouble struct {
 }
 
 func NewCollaboratorDouble() CollaboratorDouble {
-	return CollaboratorDouble{Double: moka.NewConcreteDouble()}
+	return CollaboratorDouble{Double: moka.NewStrictDouble()}
 }
 
 func (d CollaboratorDouble) Query(arg string) string {
