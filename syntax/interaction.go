@@ -8,7 +8,7 @@ type Interaction struct {
 	returnValue interface{}
 }
 
-func Receive(methodName string) Interaction {
+func ReceiveCallTo(methodName string) Interaction {
 	return Interaction{methodName: methodName}
 }
 

@@ -1,24 +1,28 @@
 package moka_test
 
 import (
-	"testing"
-
 	"github.com/gcapizzi/moka"
 	. "github.com/gcapizzi/moka/syntax"
+
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
 )
 
-func TestQueryDelegation(t *testing.T) {
-	collaborator := NewCollaboratorDouble()
-	Allow(collaborator).To(Receive("Query").With("arg").AndReturn("result"))
+var _ = Describe("Moka", func() {
+	var collaborator CollaboratorDouble
+	var subject Subject
 
-	subject := NewSubject(collaborator)
+	BeforeEach(func() {
+		collaborator = NewCollaboratorDouble()
+		subject = NewSubject(collaborator)
+	})
 
-	queryResult := subject.DelegateQuery("arg")
+	It("allows to stub a method on a double", func() {
+		Allow(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 
-	if queryResult != "result" {
-		t.Errorf("Query result: '%s'", queryResult)
-	}
-}
+		Expect(subject.DelegateQuery("arg")).To(Equal("result"))
+	})
+})
 
 type Collaborator interface {
 	Query(string) string
