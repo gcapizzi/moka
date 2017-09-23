@@ -37,7 +37,7 @@ func NewCollaboratorDouble() CollaboratorDouble {
 }
 
 func (d CollaboratorDouble) Query(arg string) string {
-	return d.Call("Query", arg).Get(0).(string)
+	return d.Call("Query", arg)[0].(string)
 }
 
 type Subject struct {

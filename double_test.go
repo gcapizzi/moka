@@ -16,11 +16,11 @@ var _ = Describe("StrictDouble", func() {
 
 	Context("when a method is stubbed", func() {
 		BeforeEach(func() {
-			double.StubMethod("UltimateQuestion", []interface{}{}, 42)
+			double.StubMethod("UltimateQuestion", []interface{}{}, []interface{}{42, nil})
 		})
 
 		It("returns the stubbed return values", func() {
-			Expect(double.Call("UltimateQuestion").Get(0)).To(Equal(42))
+			Expect(double.Call("UltimateQuestion")).To(Equal([]interface{}{42, nil}))
 		})
 	})
 })
