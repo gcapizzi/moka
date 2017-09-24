@@ -54,7 +54,7 @@ var _ = Describe("StrictDouble", func() {
 				returnValues = double.Call("UltimateQuestion", "foo", "bar")
 			})
 
-			It("fails the test", func() {
+			It("returns nil and makes the test fail", func() {
 				Expect(returnValues).To(BeNil())
 				Expect(testFailHandlerInvoked).To(BeTrue())
 				Expect(testFailMessage).To(Equal("No stub for method 'UltimateQuestion' with arguments [foo bar]"))
@@ -63,7 +63,7 @@ var _ = Describe("StrictDouble", func() {
 	})
 
 	Context("when an unknown method is called", func() {
-		It("fails the test", func() {
+		It("returns nil and makes the test fail", func() {
 			returnValues := double.Call("UnstubbedMethod")
 
 			Expect(returnValues).To(BeNil())
