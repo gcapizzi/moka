@@ -35,11 +35,11 @@ var _ = Describe("StrictDouble", func() {
 
 	Context("when an allowed method called is performed", func() {
 		BeforeEach(func() {
-			double.AllowCall(
+			double.AddInteraction(NewInteraction(
 				"UltimateQuestion",
 				[]interface{}{"life", "universe", "everything"},
 				[]interface{}{42, nil},
-			)
+			))
 		})
 
 		Context("with the right arguments", func() {
@@ -68,18 +68,18 @@ var _ = Describe("StrictDouble", func() {
 
 	Context("when a method call is expected", func() {
 		BeforeEach(func() {
-			double.ExpectCall(
+			double.AddInteraction(NewExpectedInteraction(NewInteraction(
 				"MakeMeASandwich",
 				[]interface{}{"bacon", "lettuce", "tomatoes"},
 				[]interface{}{fmt.Errorf("ain't got no bacon mate")},
-			)
+			)))
 		})
 
 		Context("and it is performed", func() {
 			Context("with the right arguments", func() {
 				BeforeEach(func() {
 					returnValues = double.Call("MakeMeASandwich", "bacon", "lettuce", "tomatoes")
-					double.VerifyCalls()
+					double.VerifyInteractions()
 				})
 
 				It("returns the mocked return values and records the call", func() {
@@ -91,7 +91,7 @@ var _ = Describe("StrictDouble", func() {
 			Context("with the wrong arguments", func() {
 				BeforeEach(func() {
 					returnValues = double.Call("MakeMeASandwich", "peanut butter", "jelly")
-					double.VerifyCalls()
+					double.VerifyInteractions()
 				})
 
 				It("returns nil and makes the test fail", func() {
@@ -104,12 +104,12 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("but it is not performed", func() {
 			BeforeEach(func() {
-				double.VerifyCalls()
+				double.VerifyInteractions()
 			})
 
 			It("makes the test fail", func() {
 				Expect(testFailHandlerInvoked).To(BeTrue())
-				Expect(testFailMessage).To(Equal("Expected the method 'MakeMeASandwich' to be called with arguments [bacon lettuce tomatoes]"))
+				Expect(testFailMessage).To(Equal("Expected interaction: MakeMeASandwich(\"bacon\", \"lettuce\", \"tomatoes\")"))
 			})
 		})
 	})

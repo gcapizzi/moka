@@ -3,28 +3,28 @@ package moka
 import (
 	"fmt"
 	"reflect"
+	"strings"
 )
 
 type Double interface {
-	AllowCall(methodName string, args []interface{}, returnValues []interface{})
-	ExpectCall(methodName string, args []interface{}, returnValues []interface{})
+	AddInteraction(interaction Interaction)
 	Call(methodName string, args ...interface{}) []interface{}
-	VerifyCalls()
+	VerifyInteractions()
 }
 
 type StrictDouble struct {
-	interactions []interaction
+	interactions []Interaction
 	failHandler  FailHandler
 }
 
 type FailHandler func(message string)
 
 func NewStrictDouble() *StrictDouble {
-	return &StrictDouble{interactions: []interaction{}}
+	return &StrictDouble{interactions: []Interaction{}}
 }
 
 func NewStrictDoubleWithFailHandler(failHandler FailHandler) *StrictDouble {
-	return &StrictDouble{interactions: []interaction{}, failHandler: failHandler}
+	return &StrictDouble{interactions: []Interaction{}, failHandler: failHandler}
 }
 
 func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{} {
@@ -39,15 +39,11 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{
 	return nil
 }
 
-func (d *StrictDouble) AllowCall(methodName string, args []interface{}, returnValues []interface{}) {
-	d.interactions = append(d.interactions, allowedInteraction{methodName: methodName, args: args, returnValues: returnValues})
+func (d *StrictDouble) AddInteraction(interaction Interaction) {
+	d.interactions = append(d.interactions, interaction)
 }
 
-func (d *StrictDouble) ExpectCall(methodName string, args []interface{}, returnValues []interface{}) {
-	d.interactions = append(d.interactions, &expectedInteraction{allowedInteraction: allowedInteraction{methodName: methodName, args: args, returnValues: returnValues}})
-}
-
-func (d *StrictDouble) VerifyCalls() {
+func (d *StrictDouble) VerifyInteractions() {
 	for _, interaction := range d.interactions {
 		err := interaction.Verify()
 		if err != nil {
@@ -56,18 +52,22 @@ func (d *StrictDouble) VerifyCalls() {
 	}
 }
 
-type interaction interface {
+type Interaction interface {
 	Call(methodName string, args []interface{}) ([]interface{}, bool)
 	Verify() error
 }
 
-type allowedInteraction struct {
+type AllowedInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
-func (i allowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+func NewInteraction(methodName string, args []interface{}, returnValues []interface{}) Interaction {
+	return AllowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
+}
+
+func (i AllowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
 	methodNamesAreEqual := i.methodName == methodName
 	argsAreEqual := reflect.DeepEqual(i.args, args)
 
@@ -78,24 +78,37 @@ func (i allowedInteraction) Call(methodName string, args []interface{}) ([]inter
 	return nil, false
 }
 
-func (i allowedInteraction) Verify() error {
+func (i AllowedInteraction) Verify() error {
 	return nil
 }
 
-type expectedInteraction struct {
-	allowedInteraction
+func (i AllowedInteraction) String() string {
+	stringArgs := []string{}
+	for _, arg := range i.args {
+		stringArgs = append(stringArgs, fmt.Sprintf("%#v", arg))
+	}
+
+	return fmt.Sprintf("%s(%s)", i.methodName, strings.Join(stringArgs, ", "))
+}
+
+type ExpectedInteraction struct {
+	Interaction
 	called bool
 }
 
-func (i *expectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	returnValues, matches := i.allowedInteraction.Call(methodName, args)
+func NewExpectedInteraction(interaction Interaction) Interaction {
+	return &ExpectedInteraction{Interaction: interaction}
+}
+
+func (i *ExpectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+	returnValues, matches := i.Interaction.Call(methodName, args)
 	i.called = matches
 	return returnValues, matches
 }
 
-func (i *expectedInteraction) Verify() error {
+func (i *ExpectedInteraction) Verify() error {
 	if !i.called {
-		return fmt.Errorf("Expected the method '%s' to be called with arguments %v", i.methodName, i.args)
+		return fmt.Errorf("Expected interaction: %s", i.Interaction)
 	}
 
 	return nil

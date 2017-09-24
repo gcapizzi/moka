@@ -10,8 +10,8 @@ func AllowDouble(double moka.Double) AllowanceTarget {
 	return AllowanceTarget{double: double}
 }
 
-func (t AllowanceTarget) To(interaction Interaction) {
-	t.double.AllowCall(interaction.methodName, interaction.args, interaction.returnValues)
+func (t AllowanceTarget) To(interactionBuilder InteractionBuilder) {
+	t.double.AddInteraction(interactionBuilder.Build())
 }
 
 type ExpectationTarget struct {
@@ -22,10 +22,10 @@ func ExpectDouble(double moka.Double) ExpectationTarget {
 	return ExpectationTarget{double: double}
 }
 
-func (t ExpectationTarget) To(interaction Interaction) {
-	t.double.ExpectCall(interaction.methodName, interaction.args, interaction.returnValues)
+func (t ExpectationTarget) To(interactionBuilder InteractionBuilder) {
+	t.double.AddInteraction(moka.NewExpectedInteraction(interactionBuilder.Build()))
 }
 
 func VerifyCalls(double moka.Double) {
-	double.VerifyCalls()
+	double.VerifyInteractions()
 }
