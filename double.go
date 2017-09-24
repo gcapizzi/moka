@@ -44,7 +44,7 @@ func (d *StrictDouble) AllowCall(methodName string, args []interface{}, returnVa
 }
 
 func (d *StrictDouble) ExpectCall(methodName string, args []interface{}, returnValues []interface{}) {
-	d.interactions = append(d.interactions, &expectedInteraction{methodName: methodName, args: args, returnValues: returnValues})
+	d.interactions = append(d.interactions, &expectedInteraction{allowedInteraction: allowedInteraction{methodName: methodName, args: args, returnValues: returnValues}})
 }
 
 func (d *StrictDouble) VerifyCalls() {
@@ -83,22 +83,14 @@ func (i allowedInteraction) Verify() error {
 }
 
 type expectedInteraction struct {
-	methodName   string
-	args         []interface{}
-	returnValues []interface{}
-	called       bool
+	allowedInteraction
+	called bool
 }
 
 func (i *expectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	methodNamesAreEqual := i.methodName == methodName
-	argsAreEqual := reflect.DeepEqual(i.args, args)
-
-	if methodNamesAreEqual && argsAreEqual {
-		i.called = true
-		return i.returnValues, true
-	}
-
-	return nil, false
+	returnValues, matches := i.allowedInteraction.Call(methodName, args)
+	i.called = matches
+	return returnValues, matches
 }
 
 func (i *expectedInteraction) Verify() error {
