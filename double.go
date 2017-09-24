@@ -6,8 +6,8 @@ import (
 )
 
 type Double interface {
-	StubMethod(methodName string, args []interface{}, returnValues []interface{})
-	MockMethod(methodName string, args []interface{}, returnValues []interface{})
+	AllowCall(methodName string, args []interface{}, returnValues []interface{})
+	ExpectCall(methodName string, args []interface{}, returnValues []interface{})
 	Call(methodName string, args ...interface{}) []interface{}
 	VerifyCalls()
 }
@@ -39,11 +39,11 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{
 	return nil
 }
 
-func (d *StrictDouble) StubMethod(methodName string, args []interface{}, returnValues []interface{}) {
+func (d *StrictDouble) AllowCall(methodName string, args []interface{}, returnValues []interface{}) {
 	d.interactions = append(d.interactions, stub{methodName: methodName, args: args, returnValues: returnValues})
 }
 
-func (d *StrictDouble) MockMethod(methodName string, args []interface{}, returnValues []interface{}) {
+func (d *StrictDouble) ExpectCall(methodName string, args []interface{}, returnValues []interface{}) {
 	d.interactions = append(d.interactions, &mock{methodName: methodName, args: args, returnValues: returnValues})
 }
 

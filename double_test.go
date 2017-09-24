@@ -33,9 +33,9 @@ var _ = Describe("StrictDouble", func() {
 		double = NewStrictDoubleWithFailHandler(testFailHandler)
 	})
 
-	Context("when a stubbed method is called", func() {
+	Context("when an allowed method called is performed", func() {
 		BeforeEach(func() {
-			double.StubMethod(
+			double.AllowCall(
 				"UltimateQuestion",
 				[]interface{}{"life", "universe", "everything"},
 				[]interface{}{42, nil},
@@ -66,16 +66,16 @@ var _ = Describe("StrictDouble", func() {
 		})
 	})
 
-	Context("when a method is mocked", func() {
+	Context("when a method call is expected", func() {
 		BeforeEach(func() {
-			double.MockMethod(
+			double.ExpectCall(
 				"MakeMeASandwich",
 				[]interface{}{"bacon", "lettuce", "tomatoes"},
 				[]interface{}{fmt.Errorf("ain't got no bacon mate")},
 			)
 		})
 
-		Context("and it is called", func() {
+		Context("and it is performed", func() {
 			Context("with the right arguments", func() {
 				BeforeEach(func() {
 					returnValues = double.Call("MakeMeASandwich", "bacon", "lettuce", "tomatoes")
@@ -102,7 +102,7 @@ var _ = Describe("StrictDouble", func() {
 			})
 		})
 
-		Context("and it is not called", func() {
+		Context("but it is not performed", func() {
 			BeforeEach(func() {
 				double.VerifyCalls()
 			})

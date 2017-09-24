@@ -21,12 +21,12 @@ var _ = Describe("Moka", func() {
 		VerifyCalls(collaborator)
 	})
 
-	It("allows to stub a method on a double", func() {
+	It("supports allowing a method call on a double", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 		Expect(subject.DelegateQuery("arg")).To(Equal("result"))
 	})
 
-	It("allows to mock a method on a double", func() {
+	It("supports expecting a method call on a double", func() {
 		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result"))
 
 		result := subject.DelegateCommand("arg")
