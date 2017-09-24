@@ -73,9 +73,9 @@ func (s stub) Call(methodName string, args []interface{}) ([]interface{}, bool) 
 
 	if methodNamesAreEqual && argsAreEqual {
 		return s.returnValues, true
-	} else {
-		return nil, false
 	}
+
+	return nil, false
 }
 
 func (s stub) Verify() error {
@@ -96,9 +96,9 @@ func (m *mock) Call(methodName string, args []interface{}) ([]interface{}, bool)
 	if methodNamesAreEqual && argsAreEqual {
 		m.called = true
 		return m.returnValues, true
-	} else {
-		return nil, false
 	}
+
+	return nil, false
 }
 
 func (m *mock) Verify() error {
