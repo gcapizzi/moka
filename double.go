@@ -35,16 +35,16 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{
 		}
 	}
 
-	d.failHandler(fmt.Sprintf("No stub or mock for method '%s' with arguments %v", methodName, args))
+	d.failHandler(fmt.Sprintf("Unexpected call to method '%s' with arguments %v", methodName, args))
 	return nil
 }
 
 func (d *StrictDouble) AllowCall(methodName string, args []interface{}, returnValues []interface{}) {
-	d.interactions = append(d.interactions, stub{methodName: methodName, args: args, returnValues: returnValues})
+	d.interactions = append(d.interactions, allowedInteraction{methodName: methodName, args: args, returnValues: returnValues})
 }
 
 func (d *StrictDouble) ExpectCall(methodName string, args []interface{}, returnValues []interface{}) {
-	d.interactions = append(d.interactions, &mock{methodName: methodName, args: args, returnValues: returnValues})
+	d.interactions = append(d.interactions, &expectedInteraction{methodName: methodName, args: args, returnValues: returnValues})
 }
 
 func (d *StrictDouble) VerifyCalls() {
@@ -61,49 +61,49 @@ type interaction interface {
 	Verify() error
 }
 
-type stub struct {
+type allowedInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
-func (s stub) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	methodNamesAreEqual := s.methodName == methodName
-	argsAreEqual := reflect.DeepEqual(s.args, args)
+func (i allowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+	methodNamesAreEqual := i.methodName == methodName
+	argsAreEqual := reflect.DeepEqual(i.args, args)
 
 	if methodNamesAreEqual && argsAreEqual {
-		return s.returnValues, true
+		return i.returnValues, true
 	}
 
 	return nil, false
 }
 
-func (s stub) Verify() error {
+func (i allowedInteraction) Verify() error {
 	return nil
 }
 
-type mock struct {
+type expectedInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 	called       bool
 }
 
-func (m *mock) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	methodNamesAreEqual := m.methodName == methodName
-	argsAreEqual := reflect.DeepEqual(m.args, args)
+func (i *expectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+	methodNamesAreEqual := i.methodName == methodName
+	argsAreEqual := reflect.DeepEqual(i.args, args)
 
 	if methodNamesAreEqual && argsAreEqual {
-		m.called = true
-		return m.returnValues, true
+		i.called = true
+		return i.returnValues, true
 	}
 
 	return nil, false
 }
 
-func (m *mock) Verify() error {
-	if !m.called {
-		return fmt.Errorf("Expected the method '%s' to be called with arguments %v", m.methodName, m.args)
+func (i *expectedInteraction) Verify() error {
+	if !i.called {
+		return fmt.Errorf("Expected the method '%s' to be called with arguments %v", i.methodName, i.args)
 	}
 
 	return nil

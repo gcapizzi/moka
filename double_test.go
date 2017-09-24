@@ -61,7 +61,7 @@ var _ = Describe("StrictDouble", func() {
 			It("returns nil and makes the test fail", func() {
 				Expect(returnValues).To(BeNil())
 				Expect(testFailHandlerInvoked).To(BeTrue())
-				Expect(testFailMessage).To(Equal("No stub or mock for method 'UltimateQuestion' with arguments [foo bar]"))
+				Expect(testFailMessage).To(Equal("Unexpected call to method 'UltimateQuestion' with arguments [foo bar]"))
 			})
 		})
 	})
@@ -97,7 +97,7 @@ var _ = Describe("StrictDouble", func() {
 				It("returns nil and makes the test fail", func() {
 					Expect(returnValues).To(BeNil())
 					Expect(testFailHandlerInvoked).To(BeTrue())
-					Expect(testFailMessage).To(Equal("No stub or mock for method 'MakeMeASandwich' with arguments [peanut butter jelly]"))
+					Expect(testFailMessage).To(Equal("Unexpected call to method 'MakeMeASandwich' with arguments [peanut butter jelly]"))
 				})
 			})
 		})
@@ -120,7 +120,7 @@ var _ = Describe("StrictDouble", func() {
 
 			Expect(returnValues).To(BeNil())
 			Expect(testFailHandlerInvoked).To(BeTrue())
-			Expect(testFailMessage).To(Equal("No stub or mock for method 'UnstubbedMethod' with arguments []"))
+			Expect(testFailMessage).To(Equal("Unexpected call to method 'UnstubbedMethod' with arguments []"))
 		})
 	})
 })
