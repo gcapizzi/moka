@@ -33,7 +33,7 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{
 		}
 	}
 
-	d.failHandler(fmt.Sprintf("Unexpected call to method '%s' with arguments %v", methodName, args))
+	d.failHandler(fmt.Sprintf("Unexpected interaction: %s", FormatMethodCall(methodName, args)))
 	return nil
 }
 

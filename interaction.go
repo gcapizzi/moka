@@ -3,7 +3,6 @@ package moka
 import (
 	"fmt"
 	"reflect"
-	"strings"
 )
 
 type Interaction interface {
@@ -37,12 +36,7 @@ func (i allowedInteraction) Verify() error {
 }
 
 func (i allowedInteraction) String() string {
-	stringArgs := []string{}
-	for _, arg := range i.args {
-		stringArgs = append(stringArgs, fmt.Sprintf("%#v", arg))
-	}
-
-	return fmt.Sprintf("%s(%s)", i.methodName, strings.Join(stringArgs, ", "))
+	return FormatMethodCall(i.methodName, i.args)
 }
 
 type expectedInteraction struct {
