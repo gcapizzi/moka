@@ -2,14 +2,14 @@ package syntax
 
 import "github.com/gcapizzi/moka"
 
-type Target struct {
+type AllowanceTarget struct {
 	double moka.Double
 }
 
 func AllowDouble(double moka.Double) AllowanceTarget {
-	return Target{double: double}
+	return AllowanceTarget{double: double}
 }
 
-func (t Target) To(invocation Interaction) {
+func (t AllowanceTarget) To(invocation Interaction) {
 	invocation.Apply(t.double)
 }
