@@ -7,8 +7,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var testFailHandlerInvoked = false
-var testFailMessage = ""
+var testFailHandlerInvoked bool
+var testFailMessage string
 
 func testFailHandler(message string) {
 	testFailHandlerInvoked = true
@@ -21,7 +21,8 @@ func resetTestFail() {
 }
 
 var _ = Describe("StrictDouble", func() {
-	var double StrictDouble
+	var double *StrictDouble
+	var returnValues []interface{}
 
 	BeforeEach(func() {
 		resetTestFail()
@@ -30,14 +31,34 @@ var _ = Describe("StrictDouble", func() {
 
 	Context("when a stubbed method is called", func() {
 		BeforeEach(func() {
-			double.StubMethod("UltimateQuestion", []interface{}{}, []interface{}{42, nil})
+			double.StubMethod(
+				"UltimateQuestion",
+				[]interface{}{"life", "universe", "everything"},
+				[]interface{}{42, nil},
+			)
 		})
 
-		It("returns the stubbed return values", func() {
-			returnValues := double.Call("UltimateQuestion")
+		Context("with the right arguments", func() {
+			BeforeEach(func() {
+				returnValues = double.Call("UltimateQuestion", "life", "universe", "everything")
+			})
 
-			Expect(returnValues).To(Equal([]interface{}{42, nil}))
-			Expect(testFailHandlerInvoked).To(BeFalse())
+			It("returns the stubbed return values", func() {
+				Expect(returnValues).To(Equal([]interface{}{42, nil}))
+				Expect(testFailHandlerInvoked).To(BeFalse())
+			})
+		})
+
+		Context("with the wrong arguments", func() {
+			BeforeEach(func() {
+				returnValues = double.Call("UltimateQuestion", "foo", "bar")
+			})
+
+			It("fails the test", func() {
+				Expect(returnValues).To(BeNil())
+				Expect(testFailHandlerInvoked).To(BeTrue())
+				Expect(testFailMessage).To(Equal("No stub for method 'UltimateQuestion' with arguments [foo bar]"))
+			})
 		})
 	})
 
@@ -47,7 +68,7 @@ var _ = Describe("StrictDouble", func() {
 
 			Expect(returnValues).To(BeNil())
 			Expect(testFailHandlerInvoked).To(BeTrue())
-			Expect(testFailMessage).To(Equal("No stub for method 'UnstubbedMethod'"))
+			Expect(testFailMessage).To(Equal("No stub for method 'UnstubbedMethod' with arguments []"))
 		})
 	})
 })
