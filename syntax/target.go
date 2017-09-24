@@ -6,7 +6,7 @@ type Target struct {
 	double moka.Double
 }
 
-func Allow(double moka.Double) Target {
+func AllowDouble(double moka.Double) AllowanceTarget {
 	return Target{double: double}
 }
 

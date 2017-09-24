@@ -18,8 +18,7 @@ var _ = Describe("Moka", func() {
 	})
 
 	It("allows to stub a method on a double", func() {
-		Allow(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
-
+		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 		Expect(subject.DelegateQuery("arg")).To(Equal("result"))
 	})
 })
