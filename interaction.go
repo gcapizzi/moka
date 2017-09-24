@@ -11,17 +11,17 @@ type Interaction interface {
 	Verify() error
 }
 
-type AllowedInteraction struct {
+type allowedInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
 func NewInteraction(methodName string, args []interface{}, returnValues []interface{}) Interaction {
-	return AllowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
+	return allowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
 }
 
-func (i AllowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+func (i allowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
 	methodNamesAreEqual := i.methodName == methodName
 	argsAreEqual := reflect.DeepEqual(i.args, args)
 
@@ -32,11 +32,11 @@ func (i AllowedInteraction) Call(methodName string, args []interface{}) ([]inter
 	return nil, false
 }
 
-func (i AllowedInteraction) Verify() error {
+func (i allowedInteraction) Verify() error {
 	return nil
 }
 
-func (i AllowedInteraction) String() string {
+func (i allowedInteraction) String() string {
 	stringArgs := []string{}
 	for _, arg := range i.args {
 		stringArgs = append(stringArgs, fmt.Sprintf("%#v", arg))
@@ -45,24 +45,24 @@ func (i AllowedInteraction) String() string {
 	return fmt.Sprintf("%s(%s)", i.methodName, strings.Join(stringArgs, ", "))
 }
 
-type ExpectedInteraction struct {
-	Interaction
-	called bool
+type expectedInteraction struct {
+	interaction Interaction
+	called      bool
 }
 
 func NewExpectedInteraction(interaction Interaction) Interaction {
-	return &ExpectedInteraction{Interaction: interaction}
+	return &expectedInteraction{interaction: interaction}
 }
 
-func (i *ExpectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	returnValues, matches := i.Interaction.Call(methodName, args)
+func (i *expectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+	returnValues, matches := i.interaction.Call(methodName, args)
 	i.called = matches
 	return returnValues, matches
 }
 
-func (i *ExpectedInteraction) Verify() error {
+func (i *expectedInteraction) Verify() error {
 	if !i.called {
-		return fmt.Errorf("Expected interaction: %s", i.Interaction)
+		return fmt.Errorf("Expected interaction: %s", i.interaction)
 	}
 
 	return nil
