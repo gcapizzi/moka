@@ -1,6 +1,8 @@
 package moka_test
 
 import (
+	"fmt"
+
 	. "github.com/gcapizzi/moka"
 
 	. "github.com/onsi/ginkgo"
@@ -11,8 +13,10 @@ var testFailHandlerInvoked bool
 var testFailMessage string
 
 func testFailHandler(message string) {
-	testFailHandlerInvoked = true
-	testFailMessage = message
+	if !testFailHandlerInvoked {
+		testFailHandlerInvoked = true
+		testFailMessage = message
+	}
 }
 
 func resetTestFail() {
@@ -57,7 +61,55 @@ var _ = Describe("StrictDouble", func() {
 			It("returns nil and makes the test fail", func() {
 				Expect(returnValues).To(BeNil())
 				Expect(testFailHandlerInvoked).To(BeTrue())
-				Expect(testFailMessage).To(Equal("No stub for method 'UltimateQuestion' with arguments [foo bar]"))
+				Expect(testFailMessage).To(Equal("No stub or mock for method 'UltimateQuestion' with arguments [foo bar]"))
+			})
+		})
+	})
+
+	Context("when a method is mocked", func() {
+		BeforeEach(func() {
+			double.MockMethod(
+				"MakeMeASandwich",
+				[]interface{}{"bacon", "lettuce", "tomatoes"},
+				[]interface{}{fmt.Errorf("ain't got no bacon mate")},
+			)
+		})
+
+		Context("and it is called", func() {
+			Context("with the right arguments", func() {
+				BeforeEach(func() {
+					returnValues = double.Call("MakeMeASandwich", "bacon", "lettuce", "tomatoes")
+					double.VerifyCalls()
+				})
+
+				It("returns the mocked return values and records the call", func() {
+					Expect(returnValues).To(Equal([]interface{}{fmt.Errorf("ain't got no bacon mate")}))
+					Expect(testFailHandlerInvoked).To(BeFalse())
+				})
+			})
+
+			Context("with the wrong arguments", func() {
+				BeforeEach(func() {
+					returnValues = double.Call("MakeMeASandwich", "peanut butter", "jelly")
+					double.VerifyCalls()
+				})
+
+				It("returns nil and makes the test fail", func() {
+					Expect(returnValues).To(BeNil())
+					Expect(testFailHandlerInvoked).To(BeTrue())
+					Expect(testFailMessage).To(Equal("No stub or mock for method 'MakeMeASandwich' with arguments [peanut butter jelly]"))
+				})
+			})
+		})
+
+		Context("and it is not called", func() {
+			BeforeEach(func() {
+				double.VerifyCalls()
+			})
+
+			It("makes the test fail", func() {
+				Expect(testFailHandlerInvoked).To(BeTrue())
+				Expect(testFailMessage).To(Equal("Expected the method 'MakeMeASandwich' to be called with arguments [bacon lettuce tomatoes]"))
 			})
 		})
 	})
@@ -68,7 +120,7 @@ var _ = Describe("StrictDouble", func() {
 
 			Expect(returnValues).To(BeNil())
 			Expect(testFailHandlerInvoked).To(BeTrue())
-			Expect(testFailMessage).To(Equal("No stub for method 'UnstubbedMethod' with arguments []"))
+			Expect(testFailMessage).To(Equal("No stub or mock for method 'UnstubbedMethod' with arguments []"))
 		})
 	})
 })

@@ -11,5 +11,21 @@ func AllowDouble(double moka.Double) AllowanceTarget {
 }
 
 func (t AllowanceTarget) To(invocation Interaction) {
-	invocation.Apply(t.double)
+	t.double.StubMethod(invocation.methodName, invocation.args, invocation.returnValues)
+}
+
+type ExpectationTarget struct {
+	double moka.Double
+}
+
+func ExpectDouble(double moka.Double) ExpectationTarget {
+	return ExpectationTarget{double: double}
+}
+
+func (t ExpectationTarget) To(invocation Interaction) {
+	t.double.MockMethod(invocation.methodName, invocation.args, invocation.returnValues)
+}
+
+func VerifyCalls(double moka.Double) {
+	double.VerifyCalls()
 }

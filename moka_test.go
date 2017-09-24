@@ -21,10 +21,20 @@ var _ = Describe("Moka", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 		Expect(subject.DelegateQuery("arg")).To(Equal("result"))
 	})
+
+	It("allows to mock a method on a double", func() {
+		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result"))
+
+		result := subject.DelegateCommand("arg")
+		Expect(result).To(Equal("result"))
+
+		VerifyCalls(collaborator)
+	})
 })
 
 type Collaborator interface {
 	Query(string) string
+	Command(string) string
 }
 
 type CollaboratorDouble struct {
@@ -39,6 +49,10 @@ func (d CollaboratorDouble) Query(arg string) string {
 	return d.Call("Query", arg)[0].(string)
 }
 
+func (d CollaboratorDouble) Command(arg string) string {
+	return d.Call("Command", arg)[0].(string)
+}
+
 type Subject struct {
 	collaborator Collaborator
 }
@@ -49,4 +63,8 @@ func NewSubject(collaborator Collaborator) Subject {
 
 func (s Subject) DelegateQuery(arg string) string {
 	return s.collaborator.Query(arg)
+}
+
+func (s Subject) DelegateCommand(arg string) string {
+	return s.collaborator.Command(arg)
 }
