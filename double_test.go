@@ -33,7 +33,7 @@ var _ = Describe("StrictDouble", func() {
 		double = NewStrictDoubleWithFailHandler(testFailHandler)
 	})
 
-	Context("when an allowed method called is performed", func() {
+	Context("when an allowed method call is performed", func() {
 		BeforeEach(func() {
 			double.AddInteraction(NewInteraction(
 				"UltimateQuestion",
