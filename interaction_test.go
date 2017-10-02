@@ -92,7 +92,7 @@ var _ = Describe("Interaction", func() {
 
 		Context("when called with the expected method name and args", func() {
 			BeforeEach(func() {
-				fakeInteraction = NewFakeInteraction([]interface{}{42, nil}, true)
+				fakeInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil)
 			})
 
 			It("delegates to the wrapped interaction and records the call for verification", func() {
@@ -104,7 +104,7 @@ var _ = Describe("Interaction", func() {
 
 		Context("when called with unexpected method names or args", func() {
 			BeforeEach(func() {
-				fakeInteraction = NewFakeInteraction(nil, false)
+				fakeInteraction = NewFakeInteraction(nil, false, nil)
 			})
 
 			It("delegates to the wrapped interaction but doesn't record the call for verification", func() {
@@ -115,29 +115,3 @@ var _ = Describe("Interaction", func() {
 		})
 	})
 })
-
-type FakeInteraction struct {
-	returnValues       []interface{}
-	matched            bool
-	ReceivedMethodName string
-	ReceivedArgs       []interface{}
-}
-
-func NewFakeInteraction(returnValues []interface{}, matched bool) *FakeInteraction {
-	return &FakeInteraction{returnValues: returnValues, matched: matched}
-}
-
-func (i *FakeInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	i.ReceivedMethodName = methodName
-	i.ReceivedArgs = args
-
-	return i.returnValues, i.matched
-}
-
-func (i *FakeInteraction) Verify() error {
-	return nil
-}
-
-func (i *FakeInteraction) String() string {
-	return "<the-interaction-string-representation>"
-}

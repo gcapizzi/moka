@@ -1,8 +1,6 @@
 package moka_test
 
 import (
-	"fmt"
-
 	. "github.com/gcapizzi/moka"
 
 	. "github.com/onsi/ginkgo"
@@ -26,101 +24,69 @@ func resetTestFail() {
 
 var _ = Describe("StrictDouble", func() {
 	var double *StrictDouble
-	var returnValues []interface{}
 
 	BeforeEach(func() {
 		resetTestFail()
 		double = NewStrictDoubleWithFailHandler(testFailHandler)
 	})
 
-	Context("when an allowed method call is performed", func() {
-		BeforeEach(func() {
-			double.AddInteraction(NewInteraction(
-				"UltimateQuestion",
-				[]interface{}{"life", "universe", "everything"},
-				[]interface{}{42, nil},
-			))
+	Describe("Call", func() {
+		var firstInteraction *FakeInteraction
+		var secondInteraction *FakeInteraction
+		var thirdInteraction *FakeInteraction
+		var returnValues []interface{}
+
+		JustBeforeEach(func() {
+			double.AddInteraction(firstInteraction)
+			double.AddInteraction(secondInteraction)
+			double.AddInteraction(thirdInteraction)
+
+			returnValues = double.Call("UltimateQuestion", "life", "universe", "everything")
 		})
 
-		Context("with the right arguments", func() {
+		Context("when some interactions match", func() {
 			BeforeEach(func() {
-				returnValues = double.Call("UltimateQuestion", "life", "universe", "everything")
+				firstInteraction = NewFakeInteraction(nil, false, nil)
+				secondInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil)
+				thirdInteraction = NewFakeInteraction([]interface{}{43, nil}, true, nil)
 			})
 
-			It("returns the stubbed return values", func() {
-				Expect(returnValues).To(Equal([]interface{}{42, nil}))
-				Expect(testFailHandlerInvoked).To(BeFalse())
+			It("returns the configured return values", func() {
+				By("stopping at the first matching interaction", func() {
+					Expect(firstInteraction.CallCalled).To(BeTrue())
+					Expect(secondInteraction.CallCalled).To(BeTrue())
+					Expect(thirdInteraction.CallCalled).To(BeFalse())
+				})
+
+				By("returning its return values", func() {
+					Expect(returnValues).To(Equal([]interface{}{42, nil}))
+				})
 			})
 		})
 
-		Context("with the wrong arguments", func() {
+		Context("when no interaction matches", func() {
 			BeforeEach(func() {
-				returnValues = double.Call("UltimateQuestion", "foo", "bar")
-			})
-
-			It("returns nil and makes the test fail", func() {
-				Expect(returnValues).To(BeNil())
-				Expect(testFailHandlerInvoked).To(BeTrue())
-				Expect(testFailMessage).To(Equal("Unexpected interaction: UltimateQuestion(\"foo\", \"bar\")"))
-			})
-		})
-	})
-
-	Context("when a method call is expected", func() {
-		BeforeEach(func() {
-			double.AddInteraction(NewExpectedInteraction(NewInteraction(
-				"MakeMeASandwich",
-				[]interface{}{"bacon", "lettuce", "tomatoes"},
-				[]interface{}{fmt.Errorf("ain't got no bacon mate")},
-			)))
-		})
-
-		Context("and it is performed", func() {
-			Context("with the right arguments", func() {
-				BeforeEach(func() {
-					returnValues = double.Call("MakeMeASandwich", "bacon", "lettuce", "tomatoes")
-					double.VerifyInteractions()
-				})
-
-				It("returns the mocked return values and records the call", func() {
-					Expect(returnValues).To(Equal([]interface{}{fmt.Errorf("ain't got no bacon mate")}))
-					Expect(testFailHandlerInvoked).To(BeFalse())
-				})
-			})
-
-			Context("with the wrong arguments", func() {
-				BeforeEach(func() {
-					returnValues = double.Call("MakeMeASandwich", "peanut butter", "jelly")
-					double.VerifyInteractions()
-				})
-
-				It("returns nil and makes the test fail", func() {
-					Expect(returnValues).To(BeNil())
-					Expect(testFailHandlerInvoked).To(BeTrue())
-					Expect(testFailMessage).To(Equal("Unexpected interaction: MakeMeASandwich(\"peanut butter\", \"jelly\")"))
-				})
-			})
-		})
-
-		Context("but it is not performed", func() {
-			BeforeEach(func() {
-				double.VerifyInteractions()
+				firstInteraction = NewFakeInteraction(nil, false, nil)
+				secondInteraction = NewFakeInteraction(nil, false, nil)
+				thirdInteraction = NewFakeInteraction(nil, false, nil)
 			})
 
 			It("makes the test fail", func() {
-				Expect(testFailHandlerInvoked).To(BeTrue())
-				Expect(testFailMessage).To(Equal("Expected interaction: MakeMeASandwich(\"bacon\", \"lettuce\", \"tomatoes\")"))
+				By("calling all interactions", func() {
+					Expect(firstInteraction.CallCalled).To(BeTrue())
+					Expect(secondInteraction.CallCalled).To(BeTrue())
+					Expect(thirdInteraction.CallCalled).To(BeTrue())
+				})
+
+				By("returning nil", func() {
+					Expect(returnValues).To(BeNil())
+				})
+
+				By("calling the fail handler", func() {
+					Expect(testFailHandlerInvoked).To(BeTrue())
+					Expect(testFailMessage).To(Equal("Unexpected interaction: UltimateQuestion(\"life\", \"universe\", \"everything\")"))
+				})
 			})
-		})
-	})
-
-	Context("when an unknown method is called", func() {
-		It("returns nil and makes the test fail", func() {
-			returnValues := double.Call("UnstubbedMethod")
-
-			Expect(returnValues).To(BeNil())
-			Expect(testFailHandlerInvoked).To(BeTrue())
-			Expect(testFailMessage).To(Equal("Unexpected interaction: UnstubbedMethod()"))
 		})
 	})
 })
