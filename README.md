@@ -1,6 +1,6 @@
 <h1 align="center">
-  <img src="https://raw.githubusercontent.com/gcapizzi/moka/master/images/logo.png" alt="moka">
-  <br>
+  <img src="https://raw.githubusercontent.com/gcapizzi/moka/master/images/logo.png" />
+  <br />
   Moka
 </h1>
 
