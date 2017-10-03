@@ -16,7 +16,7 @@ type StrictDouble struct {
 }
 
 func NewStrictDouble() *StrictDouble {
-	return &StrictDouble{interactions: []Interaction{}}
+	return &StrictDouble{interactions: []Interaction{}, failHandler: globalFailHandler}
 }
 
 func NewStrictDoubleWithFailHandler(failHandler FailHandler) *StrictDouble {

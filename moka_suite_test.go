@@ -1,6 +1,7 @@
 package moka_test
 
 import (
+	. "github.com/gcapizzi/moka"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
@@ -9,6 +10,7 @@ import (
 
 func TestMoka(t *testing.T) {
 	RegisterFailHandler(Fail)
+	RegisterDoublesFailHandler(Fail)
 	RunSpecs(t, "Moka Suite")
 }
 
