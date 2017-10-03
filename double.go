@@ -15,8 +15,6 @@ type StrictDouble struct {
 	failHandler  FailHandler
 }
 
-type FailHandler func(message string)
-
 func NewStrictDouble() *StrictDouble {
 	return &StrictDouble{interactions: []Interaction{}}
 }

@@ -10,7 +10,7 @@ import (
 var testFailHandlerInvoked bool
 var testFailMessage string
 
-func testFailHandler(message string) {
+func testFailHandler(message string, callerSkip ...int) {
 	if !testFailHandlerInvoked {
 		testFailHandlerInvoked = true
 		testFailMessage = message
