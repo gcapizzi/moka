@@ -19,7 +19,10 @@ var _ = Describe("Moka", func() {
 
 	It("supports allowing a method call on a double", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
-		Expect(subject.DelegateQuery("arg")).To(Equal("result"))
+
+		result := subject.DelegateQuery("arg")
+
+		Expect(result).To(Equal("result"))
 	})
 
 	It("supports expecting a method call on a double", func() {
