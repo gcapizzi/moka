@@ -43,9 +43,9 @@ var _ = Describe("Moka", func() {
 	})
 
 	It("supports expecting a method call on a double", func() {
-		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result"))
+		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result", nil))
 
-		result := subject.DelegateCommand("arg")
+		result, _ := subject.DelegateCommand("arg")
 
 		Expect(result).To(Equal("result"))
 		VerifyCalls(collaborator)
@@ -54,7 +54,7 @@ var _ = Describe("Moka", func() {
 
 type Collaborator interface {
 	Query(string) string
-	Command(string) string
+	Command(string) (string, error)
 }
 
 type CollaboratorDouble struct {
@@ -74,13 +74,16 @@ func (d CollaboratorDouble) Query(arg string) string {
 	return returnValues[0].(string)
 }
 
-func (d CollaboratorDouble) Command(arg string) string {
+func (d CollaboratorDouble) Command(arg string) (string, error) {
 	returnValues, err := d.Call("Command", arg)
 	if err != nil {
-		return ""
+		return "", nil
 	}
 
-	return returnValues[0].(string)
+	returnedString, _ := returnValues[0].(string)
+	returnedError, _ := returnValues[1].(error)
+
+	return returnedString, returnedError
 }
 
 type Subject struct {
@@ -95,6 +98,6 @@ func (s Subject) DelegateQuery(arg string) string {
 	return s.collaborator.Query(arg)
 }
 
-func (s Subject) DelegateCommand(arg string) string {
+func (s Subject) DelegateCommand(arg string) (string, error) {
 	return s.collaborator.Command(arg)
 }
