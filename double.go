@@ -1,12 +1,13 @@
 package moka
 
 import (
+	"errors"
 	"fmt"
 )
 
 type Double interface {
 	AddInteraction(interaction Interaction)
-	Call(methodName string, args ...interface{}) []interface{}
+	Call(methodName string, args ...interface{}) ([]interface{}, error)
 	VerifyInteractions()
 }
 
@@ -23,16 +24,17 @@ func NewStrictDoubleWithFailHandler(failHandler FailHandler) *StrictDouble {
 	return &StrictDouble{interactions: []Interaction{}, failHandler: failHandler}
 }
 
-func (d *StrictDouble) Call(methodName string, args ...interface{}) []interface{} {
+func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface{}, error) {
 	for _, interaction := range d.interactions {
 		interactionReturnValues, interactionMatches := interaction.Call(methodName, args)
 		if interactionMatches {
-			return interactionReturnValues
+			return interactionReturnValues, nil
 		}
 	}
 
-	d.failHandler(fmt.Sprintf("Unexpected interaction: %s", FormatMethodCall(methodName, args)))
-	return nil
+	errorMessage := fmt.Sprintf("Unexpected interaction: %s", FormatMethodCall(methodName, args))
+	d.failHandler(errorMessage)
+	return nil, errors.New(errorMessage)
 }
 
 func (d *StrictDouble) AddInteraction(interaction Interaction) {

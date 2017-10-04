@@ -49,11 +49,13 @@ func NewCollaboratorDouble() CollaboratorDouble {
 }
 
 func (d CollaboratorDouble) Query(arg string) string {
-	return d.Call("Query", arg)[0].(string)
+	returnValues, _ := d.Call("Query", arg)
+	return returnValues[0].(string)
 }
 
 func (d CollaboratorDouble) Command(arg string) string {
-	return d.Call("Command", arg)[0].(string)
+	returnValues, _ := d.Call("Command", arg)
+	return returnValues[0].(string)
 }
 
 type Subject struct {

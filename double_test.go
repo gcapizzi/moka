@@ -35,13 +35,14 @@ var _ = Describe("StrictDouble", func() {
 		var secondInteraction *FakeInteraction
 		var thirdInteraction *FakeInteraction
 		var returnValues []interface{}
+		var err error
 
 		JustBeforeEach(func() {
 			double.AddInteraction(firstInteraction)
 			double.AddInteraction(secondInteraction)
 			double.AddInteraction(thirdInteraction)
 
-			returnValues = double.Call("UltimateQuestion", "life", "universe", "everything")
+			returnValues, err = double.Call("UltimateQuestion", "life", "universe", "everything")
 		})
 
 		Context("when some interactions match", func() {
@@ -60,6 +61,10 @@ var _ = Describe("StrictDouble", func() {
 
 				By("returning its return values", func() {
 					Expect(returnValues).To(Equal([]interface{}{42, nil}))
+				})
+
+				By("not returning an error", func() {
+					Expect(err).NotTo(HaveOccurred())
 				})
 			})
 		})
@@ -85,6 +90,10 @@ var _ = Describe("StrictDouble", func() {
 				By("calling the fail handler", func() {
 					Expect(testFailHandlerInvoked).To(BeTrue())
 					Expect(testFailMessage).To(Equal("Unexpected interaction: UltimateQuestion(\"life\", \"universe\", \"everything\")"))
+				})
+
+				By("returning an error", func() {
+					Expect(err).To(MatchError("Unexpected interaction: UltimateQuestion(\"life\", \"universe\", \"everything\")"))
 				})
 			})
 		})
