@@ -12,7 +12,17 @@ var _ = Describe("Moka", func() {
 	var collaborator CollaboratorDouble
 	var subject Subject
 
+	var failHandlerCalled bool
+	var failHandlerMessage string
+
 	BeforeEach(func() {
+		failHandlerCalled = false
+		failHandlerMessage = ""
+		moka.RegisterDoublesFailHandler(func(message string, _ ...int) {
+			failHandlerCalled = true
+			failHandlerMessage = message
+		})
+
 		collaborator = NewCollaboratorDouble()
 		subject = NewSubject(collaborator)
 	})
@@ -23,6 +33,13 @@ var _ = Describe("Moka", func() {
 		result := subject.DelegateQuery("arg")
 
 		Expect(result).To(Equal("result"))
+	})
+
+	It("makes tests fail on unexpected interactions", func() {
+		collaborator.Query("unexpected")
+
+		Expect(failHandlerCalled).To(BeTrue())
+		Expect(failHandlerMessage).To(Equal("Unexpected interaction: Query(\"unexpected\")"))
 	})
 
 	It("supports expecting a method call on a double", func() {
@@ -49,12 +66,20 @@ func NewCollaboratorDouble() CollaboratorDouble {
 }
 
 func (d CollaboratorDouble) Query(arg string) string {
-	returnValues, _ := d.Call("Query", arg)
+	returnValues, err := d.Call("Query", arg)
+	if err != nil {
+		return ""
+	}
+
 	return returnValues[0].(string)
 }
 
 func (d CollaboratorDouble) Command(arg string) string {
-	returnValues, _ := d.Call("Command", arg)
+	returnValues, err := d.Call("Command", arg)
+	if err != nil {
+		return ""
+	}
+
 	return returnValues[0].(string)
 }
 
