@@ -15,12 +15,12 @@ func TestMoka(t *testing.T) {
 }
 
 type FakeInteraction struct {
+	CallCalled         bool
 	ReceivedMethodName string
 	ReceivedArgs       []interface{}
-	CallCalled         bool
-	VerifyCalled       bool
 	returnValues       []interface{}
 	matches            bool
+	VerifyCalled       bool
 	verifyError        error
 }
 
