@@ -1,6 +1,8 @@
 package moka_test
 
 import (
+	"errors"
+
 	. "github.com/gcapizzi/moka"
 
 	. "github.com/onsi/ginkgo"
@@ -23,6 +25,9 @@ func resetTestFail() {
 }
 
 var _ = Describe("StrictDouble", func() {
+	var firstInteraction *FakeInteraction
+	var secondInteraction *FakeInteraction
+	var thirdInteraction *FakeInteraction
 	var double *StrictDouble
 
 	BeforeEach(func() {
@@ -30,18 +35,17 @@ var _ = Describe("StrictDouble", func() {
 		double = NewStrictDoubleWithFailHandler(testFailHandler)
 	})
 
+	JustBeforeEach(func() {
+		double.AddInteraction(firstInteraction)
+		double.AddInteraction(secondInteraction)
+		double.AddInteraction(thirdInteraction)
+	})
+
 	Describe("Call", func() {
-		var firstInteraction *FakeInteraction
-		var secondInteraction *FakeInteraction
-		var thirdInteraction *FakeInteraction
 		var returnValues []interface{}
 		var err error
 
 		JustBeforeEach(func() {
-			double.AddInteraction(firstInteraction)
-			double.AddInteraction(secondInteraction)
-			double.AddInteraction(thirdInteraction)
-
 			returnValues, err = double.Call("UltimateQuestion", "life", "universe", "everything")
 		})
 
@@ -65,6 +69,10 @@ var _ = Describe("StrictDouble", func() {
 
 				By("not returning an error", func() {
 					Expect(err).NotTo(HaveOccurred())
+				})
+
+				By("not invoking the fail handler", func() {
+					Expect(testFailHandlerInvoked).To(BeFalse())
 				})
 			})
 		})
@@ -94,6 +102,53 @@ var _ = Describe("StrictDouble", func() {
 
 				By("returning an error", func() {
 					Expect(err).To(MatchError("Unexpected interaction: UltimateQuestion(\"life\", \"universe\", \"everything\")"))
+				})
+			})
+		})
+	})
+
+	Describe("VerifyInteractions", func() {
+		JustBeforeEach(func() {
+			double.VerifyInteractions()
+		})
+
+		Context("when all interactions are verified", func() {
+			BeforeEach(func() {
+				firstInteraction = NewFakeInteraction(nil, false, nil)
+				secondInteraction = NewFakeInteraction(nil, false, nil)
+				thirdInteraction = NewFakeInteraction(nil, false, nil)
+			})
+
+			It("lets the test pass", func() {
+				By("verifying all interactions", func() {
+					Expect(firstInteraction.VerifyCalled).To(BeTrue())
+					Expect(secondInteraction.VerifyCalled).To(BeTrue())
+					Expect(thirdInteraction.VerifyCalled).To(BeTrue())
+				})
+
+				By("not invoking the fail handler", func() {
+					Expect(testFailHandlerInvoked).To(BeFalse())
+				})
+			})
+		})
+
+		Context("when some interactions are not verified", func() {
+			BeforeEach(func() {
+				firstInteraction = NewFakeInteraction(nil, false, nil)
+				secondInteraction = NewFakeInteraction(nil, false, errors.New("nope"))
+				thirdInteraction = NewFakeInteraction(nil, false, nil)
+			})
+
+			It("makes the test fail", func() {
+				By("stopping at the first unverified interaction", func() {
+					Expect(firstInteraction.VerifyCalled).To(BeTrue())
+					Expect(secondInteraction.VerifyCalled).To(BeTrue())
+					Expect(thirdInteraction.VerifyCalled).To(BeFalse())
+				})
+
+				By("invoking the fail handler", func() {
+					Expect(testFailHandlerInvoked).To(BeTrue())
+					Expect(testFailMessage).To(Equal("nope"))
 				})
 			})
 		})

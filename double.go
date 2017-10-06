@@ -3,6 +3,7 @@ package moka
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type Double interface {
@@ -46,6 +47,7 @@ func (d *StrictDouble) VerifyInteractions() {
 		err := interaction.Verify()
 		if err != nil {
 			d.failHandler(err.Error())
+			return
 		}
 	}
 }
