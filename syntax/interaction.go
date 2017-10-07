@@ -21,5 +21,5 @@ func (b InteractionBuilder) AndReturn(returnValues ...interface{}) InteractionBu
 }
 
 func (b InteractionBuilder) Build() moka.Interaction {
-	return moka.NewInteraction(b.methodName, b.args, b.returnValues)
+	return moka.NewAllowedInteraction(b.methodName, b.args, b.returnValues)
 }

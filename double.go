@@ -3,7 +3,6 @@ package moka
 import (
 	"errors"
 	"fmt"
-	"reflect"
 )
 
 type Double interface {

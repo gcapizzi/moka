@@ -8,11 +8,11 @@ import (
 )
 
 var _ = Describe("Interaction", func() {
-	Describe("Default (allowed) Interaction", func() {
+	Describe("AllowedInteraction", func() {
 		var interaction Interaction
 
 		BeforeEach(func() {
-			interaction = NewInteraction(
+			interaction = NewAllowedInteraction(
 				"UltimateQuestion",
 				[]interface{}{"life", "universe", "everything"},
 				[]interface{}{42, nil},
