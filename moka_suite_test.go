@@ -44,3 +44,15 @@ func (i *FakeInteraction) Verify() error {
 func (i *FakeInteraction) String() string {
 	return "<the-interaction-string-representation>"
 }
+
+type FakeInteractionValidator struct {
+	validationError error
+}
+
+func NewFakeInteractionValidator(validationError error) FakeInteractionValidator {
+	return FakeInteractionValidator{validationError: validationError}
+}
+
+func (v FakeInteractionValidator) Validate(interaction Interaction) error {
+	return v.validationError
+}

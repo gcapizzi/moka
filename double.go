@@ -12,16 +12,17 @@ type Double interface {
 }
 
 type StrictDouble struct {
-	interactions []Interaction
-	failHandler  FailHandler
+	interactions         []Interaction
+	interactionValidator InteractionValidator
+	failHandler          FailHandler
 }
 
 func NewStrictDouble() *StrictDouble {
-	return &StrictDouble{interactions: []Interaction{}, failHandler: globalFailHandler}
+	return &StrictDouble{interactions: []Interaction{}, interactionValidator: NewNullInteractionValidator(), failHandler: globalFailHandler}
 }
 
-func NewStrictDoubleWithFailHandler(failHandler FailHandler) *StrictDouble {
-	return &StrictDouble{interactions: []Interaction{}, failHandler: failHandler}
+func NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator InteractionValidator, failHandler FailHandler) *StrictDouble {
+	return &StrictDouble{interactions: []Interaction{}, interactionValidator: interactionValidator, failHandler: failHandler}
 }
 
 func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface{}, error) {
@@ -38,6 +39,13 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface
 }
 
 func (d *StrictDouble) AddInteraction(interaction Interaction) {
+	validationError := d.interactionValidator.Validate(interaction)
+
+	if validationError != nil {
+		d.failHandler(validationError.Error())
+		return
+	}
+
 	d.interactions = append(d.interactions, interaction)
 }
 

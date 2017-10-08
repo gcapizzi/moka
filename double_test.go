@@ -25,27 +25,79 @@ func resetTestFail() {
 }
 
 var _ = Describe("StrictDouble", func() {
-	var firstInteraction *FakeInteraction
-	var secondInteraction *FakeInteraction
-	var thirdInteraction *FakeInteraction
+	var interactionValidator FakeInteractionValidator
 	var double *StrictDouble
 
 	BeforeEach(func() {
 		resetTestFail()
-		double = NewStrictDoubleWithFailHandler(testFailHandler)
 	})
 
 	JustBeforeEach(func() {
-		double.AddInteraction(firstInteraction)
-		double.AddInteraction(secondInteraction)
-		double.AddInteraction(thirdInteraction)
+		double = NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator, testFailHandler)
+	})
+
+	Describe("AddInteraction", func() {
+		JustBeforeEach(func() {
+			double.AddInteraction(NewFakeInteraction([]interface{}{"result"}, true, nil))
+		})
+
+		Context("when the interaction is valid", func() {
+			BeforeEach(func() {
+				interactionValidator = NewFakeInteractionValidator(nil)
+			})
+
+			It("succeeds", func() {
+				By("not making the test fail", func() {
+					Expect(testFailHandlerInvoked).To(BeFalse())
+				})
+
+				By("adding the interaction to the double", func() {
+					result, err := double.Call("", []interface{}{})
+
+					Expect(result).To(Equal([]interface{}{"result"}))
+					Expect(err).NotTo(HaveOccurred())
+				})
+			})
+		})
+
+		Context("when the interaction is not valid", func() {
+			BeforeEach(func() {
+				interactionValidator = NewFakeInteractionValidator(errors.New("invalid interaction!"))
+			})
+
+			It("fails", func() {
+				By("making the test fail", func() {
+					Expect(testFailHandlerInvoked).To(BeTrue())
+					Expect(testFailMessage).To(Equal("invalid interaction!"))
+				})
+
+				By("not adding the interaction to the double", func() {
+					result, err := double.Call("", []interface{}{})
+
+					Expect(result).To(BeNil())
+					Expect(err).To(HaveOccurred())
+				})
+			})
+		})
 	})
 
 	Describe("Call", func() {
+		var firstInteraction *FakeInteraction
+		var secondInteraction *FakeInteraction
+		var thirdInteraction *FakeInteraction
+
 		var returnValues []interface{}
 		var err error
 
+		BeforeEach(func() {
+			interactionValidator = NewFakeInteractionValidator(nil)
+		})
+
 		JustBeforeEach(func() {
+			double.AddInteraction(firstInteraction)
+			double.AddInteraction(secondInteraction)
+			double.AddInteraction(thirdInteraction)
+
 			returnValues, err = double.Call("UltimateQuestion", "life", "universe", "everything")
 		})
 
@@ -108,7 +160,15 @@ var _ = Describe("StrictDouble", func() {
 	})
 
 	Describe("VerifyInteractions", func() {
+		var firstInteraction *FakeInteraction
+		var secondInteraction *FakeInteraction
+		var thirdInteraction *FakeInteraction
+
 		JustBeforeEach(func() {
+			double.AddInteraction(firstInteraction)
+			double.AddInteraction(secondInteraction)
+			double.AddInteraction(thirdInteraction)
+
 			double.VerifyInteractions()
 		})
 
