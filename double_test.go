@@ -38,7 +38,7 @@ var _ = Describe("StrictDouble", func() {
 
 	Describe("AddInteraction", func() {
 		JustBeforeEach(func() {
-			double.AddInteraction(NewFakeInteraction([]interface{}{"result"}, true, nil))
+			double.AddInteraction(NewFakeInteraction([]interface{}{"result"}, true, nil, nil))
 		})
 
 		Context("when the interaction is valid", func() {
@@ -103,9 +103,9 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when some interactions match", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil)
-				secondInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil)
-				thirdInteraction = NewFakeInteraction([]interface{}{43, nil}, true, nil)
+				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
+				secondInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil, nil)
+				thirdInteraction = NewFakeInteraction([]interface{}{43, nil}, true, nil, nil)
 			})
 
 			It("returns the configured return values", func() {
@@ -131,9 +131,9 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when no interaction matches", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil)
-				secondInteraction = NewFakeInteraction(nil, false, nil)
-				thirdInteraction = NewFakeInteraction(nil, false, nil)
+				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
+				secondInteraction = NewFakeInteraction(nil, false, nil, nil)
+				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("makes the test fail", func() {
@@ -174,9 +174,9 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when all interactions are verified", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil)
-				secondInteraction = NewFakeInteraction(nil, false, nil)
-				thirdInteraction = NewFakeInteraction(nil, false, nil)
+				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
+				secondInteraction = NewFakeInteraction(nil, false, nil, nil)
+				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("lets the test pass", func() {
@@ -194,9 +194,9 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when some interactions are not verified", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil)
-				secondInteraction = NewFakeInteraction(nil, false, errors.New("nope"))
-				thirdInteraction = NewFakeInteraction(nil, false, nil)
+				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
+				secondInteraction = NewFakeInteraction(nil, false, errors.New("nope"), nil)
+				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("makes the test fail", func() {

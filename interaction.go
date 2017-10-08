@@ -8,6 +8,7 @@ import (
 type Interaction interface {
 	Call(methodName string, args []interface{}) ([]interface{}, bool)
 	Verify() error
+	CheckType(t reflect.Type) error
 }
 
 type AllowedInteraction struct {
@@ -39,6 +40,10 @@ func (i AllowedInteraction) String() string {
 	return FormatMethodCall(i.methodName, i.args)
 }
 
+func (i AllowedInteraction) CheckType(t reflect.Type) error {
+	return nil
+}
+
 type ExpectedInteraction struct {
 	interaction Interaction
 	called      bool
@@ -59,5 +64,9 @@ func (i *ExpectedInteraction) Verify() error {
 		return fmt.Errorf("Expected interaction: %s", i.interaction)
 	}
 
+	return nil
+}
+
+func (i *ExpectedInteraction) CheckType(t reflect.Type) error {
 	return nil
 }

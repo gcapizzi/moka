@@ -92,7 +92,7 @@ var _ = Describe("Interaction", func() {
 
 		Context("when called with the expected method name and args", func() {
 			BeforeEach(func() {
-				fakeInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil)
+				fakeInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil, nil)
 			})
 
 			It("delegates to the wrapped interaction and records the call for verification", func() {
@@ -104,7 +104,7 @@ var _ = Describe("Interaction", func() {
 
 		Context("when called with unexpected method names or args", func() {
 			BeforeEach(func() {
-				fakeInteraction = NewFakeInteraction(nil, false, nil)
+				fakeInteraction = NewFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("delegates to the wrapped interaction but doesn't record the call for verification", func() {
