@@ -140,7 +140,12 @@ func assignable(leftType, rightType reflect.Type) bool {
 }
 
 func isNillable(t reflect.Type) bool {
-	return reflect.Zero(t).Interface() == nil
+	return t.Kind() == reflect.Ptr ||
+		t.Kind() == reflect.Func ||
+		t.Kind() == reflect.Interface ||
+		t.Kind() == reflect.Slice ||
+		t.Kind() == reflect.Chan ||
+		t.Kind() == reflect.Map
 }
 
 func typeString(t reflect.Type) string {

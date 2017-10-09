@@ -155,6 +155,20 @@ var _ = Describe("Interaction", func() {
 				})
 			})
 
+			Context("when nil is specified for a nillable type argument", func() {
+				BeforeEach(func() {
+					interaction = NewAllowedInteraction(
+						"UltimateQuestionWithSlice",
+						[]interface{}{nil},
+						[]interface{}{42, nil},
+					)
+				})
+
+				It("succeeds", func() {
+					Expect(checkTypeError).NotTo(HaveOccurred())
+				})
+			})
+
 			Context("when the number of return values doesn't match", func() {
 				BeforeEach(func() {
 					interaction = NewAllowedInteraction(
@@ -180,6 +194,20 @@ var _ = Describe("Interaction", func() {
 
 				It("fails", func() {
 					Expect(checkTypeError).To(MatchError("Invalid interaction: type of return value 1 of method 'DeepThought.UltimateQuestion' is 'int', 'string' given"))
+				})
+			})
+
+			Context("when nil is specified for a non-nillable type return value", func() {
+				BeforeEach(func() {
+					interaction = NewAllowedInteraction(
+						"UltimateQuestion",
+						[]interface{}{"life", "universe", "everything"},
+						[]interface{}{nil, nil},
+					)
+				})
+
+				It("fails", func() {
+					Expect(checkTypeError).To(MatchError("Invalid interaction: type of return value 1 of method 'DeepThought.UltimateQuestion' is 'int', 'nil' given"))
 				})
 			})
 		})
@@ -228,4 +256,5 @@ var _ = Describe("Interaction", func() {
 
 type DeepThought interface {
 	UltimateQuestion(topicOne, topicTwo, topicThree string) (int, error)
+	UltimateQuestionWithSlice(things []string) (int, error)
 }
