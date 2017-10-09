@@ -41,6 +41,66 @@ func (i AllowedInteraction) String() string {
 }
 
 func (i AllowedInteraction) CheckType(t reflect.Type) error {
+	method, methodExists := t.MethodByName(i.methodName)
+
+	if !methodExists {
+		return fmt.Errorf("Invalid interaction: type '%s' has no method '%s'", t.Name(), i.methodName)
+	}
+
+	methodNumberOfArgs := method.Type.NumIn()
+	numberOfArgs := len(i.args)
+	if methodNumberOfArgs != numberOfArgs {
+		return fmt.Errorf(
+			"Invalid interaction: method '%s.%s' takes %d arguments, %d specified",
+			t.Name(),
+			method.Name,
+			methodNumberOfArgs,
+			numberOfArgs,
+		)
+	}
+
+	for i, arg := range i.args {
+		argType := reflect.TypeOf(arg)
+		expectedType := method.Type.In(i)
+		if !assignable(argType, expectedType) {
+			return fmt.Errorf(
+				"Invalid interaction: type of argument %d of method '%s.%s' is '%s', '%s' given",
+				i+1,
+				t.Name(),
+				method.Name,
+				typeString(expectedType),
+				typeString(argType),
+			)
+		}
+	}
+
+	methodNumberOfReturnValues := method.Type.NumOut()
+	numberOfReturnValues := len(i.returnValues)
+	if method.Type.NumOut() != len(i.returnValues) {
+		return fmt.Errorf(
+			"Invalid interaction: method '%s.%s' returns %d values, %d specified",
+			t.Name(),
+			method.Name,
+			methodNumberOfReturnValues,
+			numberOfReturnValues,
+		)
+	}
+
+	for i, returnValue := range i.returnValues {
+		returnValueType := reflect.TypeOf(returnValue)
+		expectedType := method.Type.Out(i)
+		if !assignable(returnValueType, expectedType) {
+			return fmt.Errorf(
+				"Invalid interaction: type of return value %d of method '%s.%s' is '%s', '%s' given",
+				i+1,
+				t.Name(),
+				method.Name,
+				typeString(expectedType),
+				typeString(returnValueType),
+			)
+		}
+	}
+
 	return nil
 }
 
@@ -69,4 +129,24 @@ func (i *ExpectedInteraction) Verify() error {
 
 func (i *ExpectedInteraction) CheckType(t reflect.Type) error {
 	return nil
+}
+
+func assignable(leftType, rightType reflect.Type) bool {
+	if leftType == nil {
+		return isNillable(rightType)
+	}
+
+	return leftType.AssignableTo(rightType)
+}
+
+func isNillable(t reflect.Type) bool {
+	return reflect.Zero(t).Interface() == nil
+}
+
+func typeString(t reflect.Type) string {
+	if t == nil {
+		return "nil"
+	}
+
+	return t.String()
 }
