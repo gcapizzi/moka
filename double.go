@@ -3,6 +3,7 @@ package moka
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type Double interface {
@@ -21,6 +22,14 @@ func NewStrictDouble() *StrictDouble {
 	return &StrictDouble{
 		interactions:         []Interaction{},
 		interactionValidator: NewNullInteractionValidator(),
+		failHandler:          globalFailHandler,
+	}
+}
+
+func NewStrictDoubleWithTypeOf(value interface{}) *StrictDouble {
+	return &StrictDouble{
+		interactions:         []Interaction{},
+		interactionValidator: NewTypeInteractionValidator(reflect.TypeOf(value)),
 		failHandler:          globalFailHandler,
 	}
 }

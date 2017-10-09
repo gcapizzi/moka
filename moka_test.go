@@ -30,6 +30,8 @@ var _ = Describe("Moka", func() {
 	It("supports allowing a method call on a double", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 
+		Expect(failHandlerCalled).To(BeFalse())
+
 		result := subject.DelegateQuery("arg")
 
 		Expect(result).To(Equal("result"))
@@ -44,6 +46,8 @@ var _ = Describe("Moka", func() {
 
 	It("supports expecting a method call on a double", func() {
 		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result", nil))
+
+		Expect(failHandlerCalled).To(BeFalse())
 
 		result, _ := subject.DelegateCommand("arg")
 
@@ -62,7 +66,7 @@ type CollaboratorDouble struct {
 }
 
 func NewCollaboratorDouble() CollaboratorDouble {
-	return CollaboratorDouble{Double: moka.NewStrictDouble()}
+	return CollaboratorDouble{Double: moka.NewStrictDoubleWithTypeOf(CollaboratorDouble{})}
 }
 
 func (d CollaboratorDouble) Query(arg string) string {
