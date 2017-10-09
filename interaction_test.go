@@ -1,6 +1,7 @@
 package moka_test
 
 import (
+	"fmt"
 	"reflect"
 
 	. "github.com/gcapizzi/moka"
@@ -77,139 +78,142 @@ var _ = Describe("Interaction", func() {
 		})
 
 		Describe("CheckType", func() {
-			var t = reflect.TypeOf((*DeepThought)(nil)).Elem()
+			var TestCheckType = func(t reflect.Type) {
+				var checkTypeError error
 
-			var checkTypeError error
-
-			JustBeforeEach(func() {
-				checkTypeError = interaction.CheckType(t)
-			})
-
-			Context("when the method is defined and all types match", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", "everything"},
-						[]interface{}{42, nil},
-					)
+				JustBeforeEach(func() {
+					checkTypeError = interaction.CheckType(t)
 				})
 
-				It("succeeds", func() {
-					Expect(checkTypeError).NotTo(HaveOccurred())
-				})
-			})
+				Context("when the method is defined and all types match", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", "everything"},
+							[]interface{}{42, nil},
+						)
+					})
 
-			Context("when the method is not defined", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"WorstQuestion",
-						[]interface{}{"life", "universe", "everything"},
-						[]interface{}{42, nil},
-					)
-				})
-
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: type 'DeepThought' has no method 'WorstQuestion'"))
-				})
-			})
-
-			Context("when the number of arguments doesn't match", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe"},
-						[]interface{}{42, nil},
-					)
+					It("succeeds", func() {
+						Expect(checkTypeError).NotTo(HaveOccurred())
+					})
 				})
 
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: method 'DeepThought.UltimateQuestion' takes 3 arguments, 2 specified"))
-				})
-			})
+				Context("when the method is not defined", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"WorstQuestion",
+							[]interface{}{"life", "universe", "everything"},
+							[]interface{}{42, nil},
+						)
+					})
 
-			Context("when the type of some arguments doesn't match", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", 0},
-						[]interface{}{42, nil},
-					)
-				})
-
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: type of argument 3 of method 'DeepThought.UltimateQuestion' is 'string', 'int' given"))
-				})
-			})
-
-			Context("when nil is specified for a non-nillable type argument", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", nil},
-						[]interface{}{42, nil},
-					)
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type '%s' has no method 'WorstQuestion'", t.Name())))
+					})
 				})
 
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: type of argument 3 of method 'DeepThought.UltimateQuestion' is 'string', 'nil' given"))
-				})
-			})
+				Context("when the number of arguments doesn't match", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe"},
+							[]interface{}{42, nil},
+						)
+					})
 
-			Context("when nil is specified for a nillable type argument", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestionWithSlice",
-						[]interface{}{nil},
-						[]interface{}{42, nil},
-					)
-				})
-
-				It("succeeds", func() {
-					Expect(checkTypeError).NotTo(HaveOccurred())
-				})
-			})
-
-			Context("when the number of return values doesn't match", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", "everything"},
-						[]interface{}{42},
-					)
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: method '%s.UltimateQuestion' takes 3 arguments, 2 specified", t.Name())))
+					})
 				})
 
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: method 'DeepThought.UltimateQuestion' returns 2 values, 1 specified"))
-				})
-			})
+				Context("when the type of some arguments doesn't match", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", 0},
+							[]interface{}{42, nil},
+						)
+					})
 
-			Context("when the type of return values don't match", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", "everything"},
-						[]interface{}{"forty-two", nil},
-					)
-				})
-
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: type of return value 1 of method 'DeepThought.UltimateQuestion' is 'int', 'string' given"))
-				})
-			})
-
-			Context("when nil is specified for a non-nillable type return value", func() {
-				BeforeEach(func() {
-					interaction = NewAllowedInteraction(
-						"UltimateQuestion",
-						[]interface{}{"life", "universe", "everything"},
-						[]interface{}{nil, nil},
-					)
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of argument 3 of method '%s.UltimateQuestion' is 'string', 'int' given", t.Name())))
+					})
 				})
 
-				It("fails", func() {
-					Expect(checkTypeError).To(MatchError("Invalid interaction: type of return value 1 of method 'DeepThought.UltimateQuestion' is 'int', 'nil' given"))
+				Context("when nil is specified for a non-nillable type argument", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", nil},
+							[]interface{}{42, nil},
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of argument 3 of method '%s.UltimateQuestion' is 'string', 'nil' given", t.Name())))
+					})
 				})
-			})
+
+				Context("when nil is specified for a nillable type argument", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestionWithSlice",
+							[]interface{}{nil},
+							[]interface{}{42, nil},
+						)
+					})
+
+					It("succeeds", func() {
+						Expect(checkTypeError).NotTo(HaveOccurred())
+					})
+				})
+
+				Context("when the number of return values doesn't match", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", "everything"},
+							[]interface{}{42},
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: method '%s.UltimateQuestion' returns 2 values, 1 specified", t.Name())))
+					})
+				})
+
+				Context("when the type of return values don't match", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", "everything"},
+							[]interface{}{"forty-two", nil},
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of return value 1 of method '%s.UltimateQuestion' is 'int', 'string' given", t.Name())))
+					})
+				})
+
+				Context("when nil is specified for a non-nillable type return value", func() {
+					BeforeEach(func() {
+						interaction = NewAllowedInteraction(
+							"UltimateQuestion",
+							[]interface{}{"life", "universe", "everything"},
+							[]interface{}{nil, nil},
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of return value 1 of method '%s.UltimateQuestion' is 'int', 'nil' given", t.Name())))
+					})
+				})
+			}
+
+			TestCheckType(reflect.TypeOf((*DeepThought)(nil)).Elem())
+			TestCheckType(reflect.TypeOf(MyDeepThought{}))
 		})
 	})
 
@@ -257,4 +261,14 @@ var _ = Describe("Interaction", func() {
 type DeepThought interface {
 	UltimateQuestion(topicOne, topicTwo, topicThree string) (int, error)
 	UltimateQuestionWithSlice(things []string) (int, error)
+}
+
+type MyDeepThought struct{}
+
+func (dt MyDeepThought) UltimateQuestion(topicOne, topicTwo, topicThree string) (int, error) {
+	return 42, nil
+}
+
+func (dt MyDeepThought) UltimateQuestionWithSlice(things []string) (int, error) {
+	return 42, nil
 }

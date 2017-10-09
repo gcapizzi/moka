@@ -47,21 +47,23 @@ func (i AllowedInteraction) CheckType(t reflect.Type) error {
 		return fmt.Errorf("Invalid interaction: type '%s' has no method '%s'", t.Name(), i.methodName)
 	}
 
-	methodNumberOfArgs := method.Type.NumIn()
+	expectedArgTypes := methodArgTypes(t, method)
+
+	expectedNumberOfArgs := len(expectedArgTypes)
 	numberOfArgs := len(i.args)
-	if methodNumberOfArgs != numberOfArgs {
+	if expectedNumberOfArgs != numberOfArgs {
 		return fmt.Errorf(
 			"Invalid interaction: method '%s.%s' takes %d arguments, %d specified",
 			t.Name(),
 			method.Name,
-			methodNumberOfArgs,
+			expectedNumberOfArgs,
 			numberOfArgs,
 		)
 	}
 
 	for i, arg := range i.args {
 		argType := reflect.TypeOf(arg)
-		expectedType := method.Type.In(i)
+		expectedType := expectedArgTypes[i]
 		if !assignable(argType, expectedType) {
 			return fmt.Errorf(
 				"Invalid interaction: type of argument %d of method '%s.%s' is '%s', '%s' given",
@@ -74,14 +76,14 @@ func (i AllowedInteraction) CheckType(t reflect.Type) error {
 		}
 	}
 
-	methodNumberOfReturnValues := method.Type.NumOut()
+	expectedNumberOfReturnValues := method.Type.NumOut()
 	numberOfReturnValues := len(i.returnValues)
 	if method.Type.NumOut() != len(i.returnValues) {
 		return fmt.Errorf(
 			"Invalid interaction: method '%s.%s' returns %d values, %d specified",
 			t.Name(),
 			method.Name,
-			methodNumberOfReturnValues,
+			expectedNumberOfReturnValues,
 			numberOfReturnValues,
 		)
 	}
@@ -154,4 +156,18 @@ func typeString(t reflect.Type) string {
 	}
 
 	return t.String()
+}
+
+func methodArgTypes(t reflect.Type, method reflect.Method) []reflect.Type {
+	argTypes := []reflect.Type{}
+	fromIndex := 0
+	if t.Kind() != reflect.Interface {
+		fromIndex = 1
+	}
+
+	for i := fromIndex; i < method.Type.NumIn(); i++ {
+		argTypes = append(argTypes, method.Type.In(i))
+	}
+
+	return argTypes
 }
