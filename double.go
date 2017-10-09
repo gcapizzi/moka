@@ -18,11 +18,19 @@ type StrictDouble struct {
 }
 
 func NewStrictDouble() *StrictDouble {
-	return &StrictDouble{interactions: []Interaction{}, interactionValidator: NewNullInteractionValidator(), failHandler: globalFailHandler}
+	return &StrictDouble{
+		interactions:         []Interaction{},
+		interactionValidator: NewNullInteractionValidator(),
+		failHandler:          globalFailHandler,
+	}
 }
 
 func NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator InteractionValidator, failHandler FailHandler) *StrictDouble {
-	return &StrictDouble{interactions: []Interaction{}, interactionValidator: interactionValidator, failHandler: failHandler}
+	return &StrictDouble{
+		interactions:         []Interaction{},
+		interactionValidator: interactionValidator,
+		failHandler:          failHandler,
+	}
 }
 
 func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface{}, error) {
