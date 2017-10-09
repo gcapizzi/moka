@@ -85,7 +85,7 @@ var _ = Describe("Interaction", func() {
 				checkTypeError = interaction.CheckType(t)
 			})
 
-			Context("when the method exists and all types match", func() {
+			Context("when the method is defined and all types match", func() {
 				BeforeEach(func() {
 					interaction = NewAllowedInteraction(
 						"UltimateQuestion",
@@ -127,7 +127,7 @@ var _ = Describe("Interaction", func() {
 				})
 			})
 
-			Context("when the type of arguments don't match", func() {
+			Context("when the type of some arguments doesn't match", func() {
 				BeforeEach(func() {
 					interaction = NewAllowedInteraction(
 						"UltimateQuestion",
@@ -141,7 +141,7 @@ var _ = Describe("Interaction", func() {
 				})
 			})
 
-			Context("when a nil is specified for a non-nillable type", func() {
+			Context("when nil is specified for a non-nillable type argument", func() {
 				BeforeEach(func() {
 					interaction = NewAllowedInteraction(
 						"UltimateQuestion",
