@@ -1,9 +1,6 @@
-package moka_test
+package moka
 
 import (
-	"github.com/gcapizzi/moka"
-	. "github.com/gcapizzi/moka/syntax"
-
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
@@ -18,7 +15,7 @@ var _ = Describe("Moka", func() {
 	BeforeEach(func() {
 		failHandlerCalled = false
 		failHandlerMessage = ""
-		moka.RegisterDoublesFailHandler(func(message string, _ ...int) {
+		RegisterDoublesFailHandler(func(message string, _ ...int) {
 			failHandlerCalled = true
 			failHandlerMessage = message
 		})
@@ -62,11 +59,11 @@ type Collaborator interface {
 }
 
 type CollaboratorDouble struct {
-	moka.Double
+	Double
 }
 
 func NewCollaboratorDouble() CollaboratorDouble {
-	return CollaboratorDouble{Double: moka.NewStrictDoubleWithTypeOf(CollaboratorDouble{})}
+	return CollaboratorDouble{Double: NewStrictDoubleWithTypeOf(CollaboratorDouble{})}
 }
 
 func (d CollaboratorDouble) Query(arg string) string {

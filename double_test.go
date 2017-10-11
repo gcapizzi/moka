@@ -1,9 +1,7 @@
-package moka_test
+package moka
 
 import (
 	"errors"
-
-	. "github.com/gcapizzi/moka"
 
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"

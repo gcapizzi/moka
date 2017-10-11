@@ -1,9 +1,8 @@
-package moka_test
+package moka
 
 import (
 	"reflect"
 
-	. "github.com/gcapizzi/moka"
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 
