@@ -27,10 +27,11 @@ var _ = Describe("Moka", func() {
 	It("supports allowing a method call on a double", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").With("arg").AndReturn("result"))
 
-		Expect(failHandlerCalled).To(BeFalse())
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 
 		result := subject.DelegateQuery("arg")
 
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 		Expect(result).To(Equal("result"))
 	})
 
@@ -49,7 +50,10 @@ var _ = Describe("Moka", func() {
 		result, _ := subject.DelegateCommand("arg")
 
 		Expect(result).To(Equal("result"))
+
 		VerifyCalls(collaborator)
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 	})
 })
 
