@@ -60,13 +60,13 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when the interaction is not valid", func() {
 			BeforeEach(func() {
-				interactionValidator = NewFakeInteractionValidator(errors.New("invalid interaction!"))
+				interactionValidator = newFakeInteractionValidator(errors.New("invalid interaction"))
 			})
 
 			It("fails", func() {
 				By("making the test fail", func() {
 					Expect(testFailHandlerInvoked).To(BeTrue())
-					Expect(testFailMessage).To(Equal("invalid interaction!"))
+					Expect(testFailMessage).To(Equal("invalid interaction"))
 				})
 
 				By("not adding the interaction to the double", func() {
