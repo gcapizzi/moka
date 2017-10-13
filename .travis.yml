@@ -9,4 +9,10 @@ os:
   - linux
   - osx
 
+install:
+  - go get -v -t ./...
+  - go get github.com/onsi/gomega
+  - go install github.com/onsi/ginkgo/ginkgo
+  - export PATH=$PATH:$GOPATH/bin
+
 script: ginkgo -r --randomizeAllSpecs --randomizeSuites --race --trace
