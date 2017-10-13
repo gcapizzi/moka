@@ -1,0 +1,12 @@
+language: go
+
+go:
+  - 1.9.x
+  - 1.8.x
+  - master
+
+os:
+  - linux
+  - osx
+
+script: ginkgo -r --randomizeAllSpecs --randomizeSuites --race --trace
