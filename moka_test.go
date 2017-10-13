@@ -55,11 +55,23 @@ var _ = Describe("Moka", func() {
 
 		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 	})
+
+	It("supports allowing a method call on a double with variadic args", func() {
+		AllowDouble(collaborator).To(ReceiveCallTo("VariadicQuery").With([]string{"arg1", "arg2", "arg3"}).AndReturn("result"))
+
+		Expect(failHandlerCalled).To(BeFalse())
+
+		result := subject.DelegateVariadicQuery("arg1", "arg2", "arg3")
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
+		Expect(result).To(Equal("result"))
+	})
 })
 
 type Collaborator interface {
 	Query(string) string
 	Command(string) (string, error)
+	VariadicQuery(...string) string
 }
 
 type CollaboratorDouble struct {
@@ -91,6 +103,15 @@ func (d CollaboratorDouble) Command(arg string) (string, error) {
 	return returnedString, returnedError
 }
 
+func (d CollaboratorDouble) VariadicQuery(args ...string) string {
+	returnValues, err := d.Call("VariadicQuery", args)
+	if err != nil {
+		return ""
+	}
+
+	return returnValues[0].(string)
+}
+
 type Subject struct {
 	collaborator Collaborator
 }
@@ -105,4 +126,8 @@ func (s Subject) DelegateQuery(arg string) string {
 
 func (s Subject) DelegateCommand(arg string) (string, error) {
 	return s.collaborator.Command(arg)
+}
+
+func (s Subject) DelegateVariadicQuery(args ...string) string {
+	return s.collaborator.VariadicQuery(args...)
 }
