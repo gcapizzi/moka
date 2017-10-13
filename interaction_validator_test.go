@@ -10,35 +10,35 @@ import (
 
 var _ = Describe("InteractionValidator", func() {
 	Describe("NullInteractionValidator", func() {
-		var nullInteractionValidator NullInteractionValidator
+		var nullInteractionValidator nullInteractionValidator
 
 		BeforeEach(func() {
-			nullInteractionValidator = NewNullInteractionValidator()
+			nullInteractionValidator = newNullInteractionValidator()
 		})
 
 		It("never returns an error", func() {
-			Expect(nullInteractionValidator.Validate(nil)).To(BeNil())
-			Expect(nullInteractionValidator.Validate(NewFakeInteraction(nil, false, nil, nil))).To(BeNil())
+			Expect(nullInteractionValidator.validate(nil)).To(BeNil())
+			Expect(nullInteractionValidator.validate(newFakeInteraction(nil, false, nil, nil))).To(BeNil())
 		})
 	})
 
 	Describe("TypeInteractionValidator", func() {
-		var fakeInteraction *FakeInteraction
-		var typeInteractionValidator TypeInteractionValidator
+		var fakeInteraction *fakeInteraction
+		var typeInteractionValidator typeInteractionValidator
 
 		BeforeEach(func() {
-			fakeInteraction = NewFakeInteraction(nil, false, nil, errors.New("CheckType failed"))
-			typeInteractionValidator = NewTypeInteractionValidator(reflect.TypeOf(SomeType{}))
+			fakeInteraction = newFakeInteraction(nil, false, nil, errors.New("CheckType failed"))
+			typeInteractionValidator = newTypeInteractionValidator(reflect.TypeOf(someType{}))
 		})
 
 		It("checks the interaction against the type", func() {
-			err := typeInteractionValidator.Validate(fakeInteraction)
+			err := typeInteractionValidator.validate(fakeInteraction)
 
 			Expect(err).To(MatchError("CheckType failed"))
-			Expect(fakeInteraction.CheckTypeCalled).To(BeTrue())
-			Expect(fakeInteraction.ReceivedType).To(Equal(reflect.TypeOf(SomeType{})))
+			Expect(fakeInteraction.checkTypeCalled).To(BeTrue())
+			Expect(fakeInteraction.receivedType).To(Equal(reflect.TypeOf(someType{})))
 		})
 	})
 })
 
-type SomeType struct{}
+type someType struct{}

@@ -7,36 +7,36 @@ import (
 )
 
 type Double interface {
-	AddInteraction(interaction Interaction)
+	addInteraction(interaction interaction)
 	Call(methodName string, args ...interface{}) ([]interface{}, error)
-	VerifyInteractions()
+	verifyInteractions()
 }
 
 type StrictDouble struct {
-	interactions         []Interaction
-	interactionValidator InteractionValidator
-	failHandler          FailHandler
+	interactions         []interaction
+	interactionValidator interactionValidator
+	failHandler          failHandler
 }
 
 func NewStrictDouble() *StrictDouble {
 	return &StrictDouble{
-		interactions:         []Interaction{},
-		interactionValidator: NewNullInteractionValidator(),
+		interactions:         []interaction{},
+		interactionValidator: newNullInteractionValidator(),
 		failHandler:          globalFailHandler,
 	}
 }
 
 func NewStrictDoubleWithTypeOf(value interface{}) *StrictDouble {
 	return &StrictDouble{
-		interactions:         []Interaction{},
-		interactionValidator: NewTypeInteractionValidator(reflect.TypeOf(value)),
+		interactions:         []interaction{},
+		interactionValidator: newTypeInteractionValidator(reflect.TypeOf(value)),
 		failHandler:          globalFailHandler,
 	}
 }
 
-func NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator InteractionValidator, failHandler FailHandler) *StrictDouble {
+func newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator interactionValidator, failHandler failHandler) *StrictDouble {
 	return &StrictDouble{
-		interactions:         []Interaction{},
+		interactions:         []interaction{},
 		interactionValidator: interactionValidator,
 		failHandler:          failHandler,
 	}
@@ -44,19 +44,19 @@ func NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator 
 
 func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface{}, error) {
 	for _, interaction := range d.interactions {
-		interactionReturnValues, interactionMatches := interaction.Call(methodName, args)
+		interactionReturnValues, interactionMatches := interaction.call(methodName, args)
 		if interactionMatches {
 			return interactionReturnValues, nil
 		}
 	}
 
-	errorMessage := fmt.Sprintf("Unexpected interaction: %s", FormatMethodCall(methodName, args))
+	errorMessage := fmt.Sprintf("Unexpected interaction: %s", formatMethodCall(methodName, args))
 	d.failHandler(errorMessage)
 	return nil, errors.New(errorMessage)
 }
 
-func (d *StrictDouble) AddInteraction(interaction Interaction) {
-	validationError := d.interactionValidator.Validate(interaction)
+func (d *StrictDouble) addInteraction(interaction interaction) {
+	validationError := d.interactionValidator.validate(interaction)
 
 	if validationError != nil {
 		d.failHandler(validationError.Error())
@@ -66,9 +66,9 @@ func (d *StrictDouble) AddInteraction(interaction Interaction) {
 	d.interactions = append(d.interactions, interaction)
 }
 
-func (d *StrictDouble) VerifyInteractions() {
+func (d *StrictDouble) verifyInteractions() {
 	for _, interaction := range d.interactions {
-		err := interaction.Verify()
+		err := interaction.verify()
 		if err != nil {
 			d.failHandler(err.Error())
 			return

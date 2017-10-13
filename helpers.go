@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-func FormatMethodCall(methodName string, args []interface{}) string {
+func formatMethodCall(methodName string, args []interface{}) string {
 	stringArgs := []string{}
 	for _, arg := range args {
 		stringArgs = append(stringArgs, fmt.Sprintf("%#v", arg))

@@ -1,10 +1,10 @@
 package moka
 
-type FailHandler func(message string, callerSkip ...int)
+type failHandler func(message string, callerSkip ...int)
 
-var globalFailHandler FailHandler
+var globalFailHandler failHandler
 
-func RegisterDoublesFailHandler(failHandler FailHandler) {
+func RegisterDoublesFailHandler(failHandler failHandler) {
 	globalFailHandler = failHandler
 }
 
@@ -17,7 +17,7 @@ func AllowDouble(double Double) AllowanceTarget {
 }
 
 func (t AllowanceTarget) To(interactionBuilder InteractionBuilder) {
-	t.double.AddInteraction(interactionBuilder.Build())
+	t.double.addInteraction(interactionBuilder.build())
 }
 
 type ExpectationTarget struct {
@@ -29,11 +29,11 @@ func ExpectDouble(double Double) ExpectationTarget {
 }
 
 func (t ExpectationTarget) To(interactionBuilder InteractionBuilder) {
-	t.double.AddInteraction(NewExpectedInteraction(interactionBuilder.Build()))
+	t.double.addInteraction(newExpectedInteraction(interactionBuilder.build()))
 }
 
 func VerifyCalls(double Double) {
-	double.VerifyInteractions()
+	double.verifyInteractions()
 }
 
 type InteractionBuilder struct {
@@ -54,6 +54,6 @@ func (b InteractionBuilder) AndReturn(returnValues ...interface{}) InteractionBu
 	return InteractionBuilder{methodName: b.methodName, args: b.args, returnValues: returnValues}
 }
 
-func (b InteractionBuilder) Build() Interaction {
-	return NewAllowedInteraction(b.methodName, b.args, b.returnValues)
+func (b InteractionBuilder) build() interaction {
+	return newAllowedInteraction(b.methodName, b.args, b.returnValues)
 }

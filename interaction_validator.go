@@ -2,28 +2,28 @@ package moka
 
 import "reflect"
 
-type InteractionValidator interface {
-	Validate(interaction Interaction) error
+type interactionValidator interface {
+	validate(interaction interaction) error
 }
 
-type TypeInteractionValidator struct {
+type typeInteractionValidator struct {
 	t reflect.Type
 }
 
-func NewTypeInteractionValidator(t reflect.Type) TypeInteractionValidator {
-	return TypeInteractionValidator{t: t}
+func newTypeInteractionValidator(t reflect.Type) typeInteractionValidator {
+	return typeInteractionValidator{t: t}
 }
 
-func (v TypeInteractionValidator) Validate(interaction Interaction) error {
-	return interaction.CheckType(v.t)
+func (v typeInteractionValidator) validate(interaction interaction) error {
+	return interaction.checkType(v.t)
 }
 
-type NullInteractionValidator struct{}
+type nullInteractionValidator struct{}
 
-func NewNullInteractionValidator() NullInteractionValidator {
-	return NullInteractionValidator{}
+func newNullInteractionValidator() nullInteractionValidator {
+	return nullInteractionValidator{}
 }
 
-func (v NullInteractionValidator) Validate(interaction Interaction) error {
+func (v nullInteractionValidator) validate(interaction interaction) error {
 	return nil
 }

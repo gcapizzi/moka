@@ -15,53 +15,53 @@ func TestMoka(t *testing.T) {
 	RunSpecs(t, "Moka Suite")
 }
 
-type FakeInteraction struct {
-	CallCalled         bool
-	ReceivedMethodName string
-	ReceivedArgs       []interface{}
+type fakeInteraction struct {
+	callCalled         bool
+	receivedMethodName string
+	receivedArgs       []interface{}
 	returnValues       []interface{}
 	matches            bool
-	VerifyCalled       bool
+	verifyCalled       bool
 	verifyError        error
-	CheckTypeCalled    bool
-	ReceivedType       reflect.Type
+	checkTypeCalled    bool
+	receivedType       reflect.Type
 	checkTypeError     error
 }
 
-func NewFakeInteraction(returnValues []interface{}, matches bool, verifyError error, checkTypeError error) *FakeInteraction {
-	return &FakeInteraction{returnValues: returnValues, matches: matches, verifyError: verifyError, checkTypeError: checkTypeError}
+func newFakeInteraction(returnValues []interface{}, matches bool, verifyError error, checkTypeError error) *fakeInteraction {
+	return &fakeInteraction{returnValues: returnValues, matches: matches, verifyError: verifyError, checkTypeError: checkTypeError}
 }
 
-func (i *FakeInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	i.CallCalled = true
-	i.ReceivedMethodName = methodName
-	i.ReceivedArgs = args
+func (i *fakeInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
+	i.callCalled = true
+	i.receivedMethodName = methodName
+	i.receivedArgs = args
 	return i.returnValues, i.matches
 }
 
-func (i *FakeInteraction) Verify() error {
-	i.VerifyCalled = true
+func (i *fakeInteraction) verify() error {
+	i.verifyCalled = true
 	return i.verifyError
 }
 
-func (i *FakeInteraction) CheckType(t reflect.Type) error {
-	i.CheckTypeCalled = true
-	i.ReceivedType = t
+func (i *fakeInteraction) checkType(t reflect.Type) error {
+	i.checkTypeCalled = true
+	i.receivedType = t
 	return i.checkTypeError
 }
 
-func (i *FakeInteraction) String() string {
+func (i *fakeInteraction) String() string {
 	return "<the-interaction-string-representation>"
 }
 
-type FakeInteractionValidator struct {
+type fakeInteractionValidator struct {
 	validationError error
 }
 
-func NewFakeInteractionValidator(validationError error) FakeInteractionValidator {
-	return FakeInteractionValidator{validationError: validationError}
+func newFakeInteractionValidator(validationError error) fakeInteractionValidator {
+	return fakeInteractionValidator{validationError: validationError}
 }
 
-func (v FakeInteractionValidator) Validate(interaction Interaction) error {
+func (v fakeInteractionValidator) validate(interaction interaction) error {
 	return v.validationError
 }

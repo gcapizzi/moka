@@ -5,23 +5,23 @@ import (
 	"reflect"
 )
 
-type Interaction interface {
-	Call(methodName string, args []interface{}) ([]interface{}, bool)
-	Verify() error
-	CheckType(t reflect.Type) error
+type interaction interface {
+	call(methodName string, args []interface{}) ([]interface{}, bool)
+	verify() error
+	checkType(t reflect.Type) error
 }
 
-type AllowedInteraction struct {
+type allowedInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
-func NewAllowedInteraction(methodName string, args []interface{}, returnValues []interface{}) AllowedInteraction {
-	return AllowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
+func newAllowedInteraction(methodName string, args []interface{}, returnValues []interface{}) allowedInteraction {
+	return allowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
 }
 
-func (i AllowedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
+func (i allowedInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
 	methodNamesAreEqual := i.methodName == methodName
 	argsAreEqual := reflect.DeepEqual(i.args, args)
 
@@ -32,15 +32,15 @@ func (i AllowedInteraction) Call(methodName string, args []interface{}) ([]inter
 	return nil, false
 }
 
-func (i AllowedInteraction) Verify() error {
+func (i allowedInteraction) verify() error {
 	return nil
 }
 
-func (i AllowedInteraction) String() string {
-	return FormatMethodCall(i.methodName, i.args)
+func (i allowedInteraction) String() string {
+	return formatMethodCall(i.methodName, i.args)
 }
 
-func (i AllowedInteraction) CheckType(t reflect.Type) error {
+func (i allowedInteraction) checkType(t reflect.Type) error {
 	method, methodExists := t.MethodByName(i.methodName)
 
 	if !methodExists {
@@ -106,22 +106,22 @@ func (i AllowedInteraction) CheckType(t reflect.Type) error {
 	return nil
 }
 
-type ExpectedInteraction struct {
-	interaction Interaction
+type expectedInteraction struct {
+	interaction interaction
 	called      bool
 }
 
-func NewExpectedInteraction(interaction Interaction) *ExpectedInteraction {
-	return &ExpectedInteraction{interaction: interaction}
+func newExpectedInteraction(interaction interaction) *expectedInteraction {
+	return &expectedInteraction{interaction: interaction}
 }
 
-func (i *ExpectedInteraction) Call(methodName string, args []interface{}) ([]interface{}, bool) {
-	returnValues, matches := i.interaction.Call(methodName, args)
+func (i *expectedInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
+	returnValues, matches := i.interaction.call(methodName, args)
 	i.called = matches
 	return returnValues, matches
 }
 
-func (i *ExpectedInteraction) Verify() error {
+func (i *expectedInteraction) verify() error {
 	if !i.called {
 		return fmt.Errorf("Expected interaction: %s", i.interaction)
 	}
@@ -129,7 +129,7 @@ func (i *ExpectedInteraction) Verify() error {
 	return nil
 }
 
-func (i *ExpectedInteraction) CheckType(t reflect.Type) error {
+func (i *expectedInteraction) checkType(t reflect.Type) error {
 	return nil
 }
 

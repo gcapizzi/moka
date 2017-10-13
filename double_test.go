@@ -23,7 +23,7 @@ func resetTestFail() {
 }
 
 var _ = Describe("StrictDouble", func() {
-	var interactionValidator FakeInteractionValidator
+	var interactionValidator fakeInteractionValidator
 	var double *StrictDouble
 
 	BeforeEach(func() {
@@ -31,17 +31,17 @@ var _ = Describe("StrictDouble", func() {
 	})
 
 	JustBeforeEach(func() {
-		double = NewStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator, testFailHandler)
+		double = newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator, testFailHandler)
 	})
 
-	Describe("AddInteraction", func() {
+	Describe("addInteraction", func() {
 		JustBeforeEach(func() {
-			double.AddInteraction(NewFakeInteraction([]interface{}{"result"}, true, nil, nil))
+			double.addInteraction(newFakeInteraction([]interface{}{"result"}, true, nil, nil))
 		})
 
 		Context("when the interaction is valid", func() {
 			BeforeEach(func() {
-				interactionValidator = NewFakeInteractionValidator(nil)
+				interactionValidator = newFakeInteractionValidator(nil)
 			})
 
 			It("succeeds", func() {
@@ -80,37 +80,37 @@ var _ = Describe("StrictDouble", func() {
 	})
 
 	Describe("Call", func() {
-		var firstInteraction *FakeInteraction
-		var secondInteraction *FakeInteraction
-		var thirdInteraction *FakeInteraction
+		var firstInteraction *fakeInteraction
+		var secondInteraction *fakeInteraction
+		var thirdInteraction *fakeInteraction
 
 		var returnValues []interface{}
 		var err error
 
 		BeforeEach(func() {
-			interactionValidator = NewFakeInteractionValidator(nil)
+			interactionValidator = newFakeInteractionValidator(nil)
 		})
 
 		JustBeforeEach(func() {
-			double.AddInteraction(firstInteraction)
-			double.AddInteraction(secondInteraction)
-			double.AddInteraction(thirdInteraction)
+			double.addInteraction(firstInteraction)
+			double.addInteraction(secondInteraction)
+			double.addInteraction(thirdInteraction)
 
 			returnValues, err = double.Call("UltimateQuestion", "life", "universe", "everything")
 		})
 
 		Context("when some interactions match", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
-				secondInteraction = NewFakeInteraction([]interface{}{42, nil}, true, nil, nil)
-				thirdInteraction = NewFakeInteraction([]interface{}{43, nil}, true, nil, nil)
+				firstInteraction = newFakeInteraction(nil, false, nil, nil)
+				secondInteraction = newFakeInteraction([]interface{}{42, nil}, true, nil, nil)
+				thirdInteraction = newFakeInteraction([]interface{}{43, nil}, true, nil, nil)
 			})
 
 			It("returns the configured return values", func() {
 				By("stopping at the first matching interaction", func() {
-					Expect(firstInteraction.CallCalled).To(BeTrue())
-					Expect(secondInteraction.CallCalled).To(BeTrue())
-					Expect(thirdInteraction.CallCalled).To(BeFalse())
+					Expect(firstInteraction.callCalled).To(BeTrue())
+					Expect(secondInteraction.callCalled).To(BeTrue())
+					Expect(thirdInteraction.callCalled).To(BeFalse())
 				})
 
 				By("returning its return values", func() {
@@ -129,16 +129,16 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when no interaction matches", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
-				secondInteraction = NewFakeInteraction(nil, false, nil, nil)
-				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
+				firstInteraction = newFakeInteraction(nil, false, nil, nil)
+				secondInteraction = newFakeInteraction(nil, false, nil, nil)
+				thirdInteraction = newFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("makes the test fail", func() {
 				By("calling all interactions", func() {
-					Expect(firstInteraction.CallCalled).To(BeTrue())
-					Expect(secondInteraction.CallCalled).To(BeTrue())
-					Expect(thirdInteraction.CallCalled).To(BeTrue())
+					Expect(firstInteraction.callCalled).To(BeTrue())
+					Expect(secondInteraction.callCalled).To(BeTrue())
+					Expect(thirdInteraction.callCalled).To(BeTrue())
 				})
 
 				By("returning nil", func() {
@@ -157,31 +157,31 @@ var _ = Describe("StrictDouble", func() {
 		})
 	})
 
-	Describe("VerifyInteractions", func() {
-		var firstInteraction *FakeInteraction
-		var secondInteraction *FakeInteraction
-		var thirdInteraction *FakeInteraction
+	Describe("verifyInteractions", func() {
+		var firstInteraction *fakeInteraction
+		var secondInteraction *fakeInteraction
+		var thirdInteraction *fakeInteraction
 
 		JustBeforeEach(func() {
-			double.AddInteraction(firstInteraction)
-			double.AddInteraction(secondInteraction)
-			double.AddInteraction(thirdInteraction)
+			double.addInteraction(firstInteraction)
+			double.addInteraction(secondInteraction)
+			double.addInteraction(thirdInteraction)
 
-			double.VerifyInteractions()
+			double.verifyInteractions()
 		})
 
 		Context("when all interactions are verified", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
-				secondInteraction = NewFakeInteraction(nil, false, nil, nil)
-				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
+				firstInteraction = newFakeInteraction(nil, false, nil, nil)
+				secondInteraction = newFakeInteraction(nil, false, nil, nil)
+				thirdInteraction = newFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("lets the test pass", func() {
 				By("verifying all interactions", func() {
-					Expect(firstInteraction.VerifyCalled).To(BeTrue())
-					Expect(secondInteraction.VerifyCalled).To(BeTrue())
-					Expect(thirdInteraction.VerifyCalled).To(BeTrue())
+					Expect(firstInteraction.verifyCalled).To(BeTrue())
+					Expect(secondInteraction.verifyCalled).To(BeTrue())
+					Expect(thirdInteraction.verifyCalled).To(BeTrue())
 				})
 
 				By("not invoking the fail handler", func() {
@@ -192,16 +192,16 @@ var _ = Describe("StrictDouble", func() {
 
 		Context("when some interactions are not verified", func() {
 			BeforeEach(func() {
-				firstInteraction = NewFakeInteraction(nil, false, nil, nil)
-				secondInteraction = NewFakeInteraction(nil, false, errors.New("nope"), nil)
-				thirdInteraction = NewFakeInteraction(nil, false, nil, nil)
+				firstInteraction = newFakeInteraction(nil, false, nil, nil)
+				secondInteraction = newFakeInteraction(nil, false, errors.New("nope"), nil)
+				thirdInteraction = newFakeInteraction(nil, false, nil, nil)
 			})
 
 			It("makes the test fail", func() {
 				By("stopping at the first unverified interaction", func() {
-					Expect(firstInteraction.VerifyCalled).To(BeTrue())
-					Expect(secondInteraction.VerifyCalled).To(BeTrue())
-					Expect(thirdInteraction.VerifyCalled).To(BeFalse())
+					Expect(firstInteraction.verifyCalled).To(BeTrue())
+					Expect(secondInteraction.verifyCalled).To(BeTrue())
+					Expect(thirdInteraction.verifyCalled).To(BeFalse())
 				})
 
 				By("invoking the fail handler", func() {
