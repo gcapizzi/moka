@@ -1,9 +1,9 @@
 language: go
 
 go:
+  - master
   - 1.9.x
   - 1.8.x
-  - master
 
 install:
   - go get -v -t ./...
@@ -12,4 +12,3 @@ install:
   - export PATH=$PATH:$GOPATH/bin
 
 script: ginkgo -r --randomizeAllSpecs --randomizeSuites --failOnPending --trace --race --compilers=2
-
