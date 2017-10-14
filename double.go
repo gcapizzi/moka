@@ -6,18 +6,24 @@ import (
 	"reflect"
 )
 
+// Double is the interface implemented by all Moka double types.
 type Double interface {
 	addInteraction(interaction interaction)
 	Call(methodName string, args ...interface{}) ([]interface{}, error)
 	verifyInteractions()
 }
 
+// StrictDouble is a strict implementation of the Double interface.
+// Any invocation of the `Call` method that won't match any of the configured
+// interactions will trigger a test failure and return an error.
 type StrictDouble struct {
 	interactions         []interaction
 	interactionValidator interactionValidator
 	failHandler          FailHandler
 }
 
+// NewStrictDouble instantiates a new `StrictDouble`, using the global fail
+// handler and no validation on the configured interactions.
 func NewStrictDouble() *StrictDouble {
 	return &StrictDouble{
 		interactions:         []interaction{},
@@ -26,6 +32,9 @@ func NewStrictDouble() *StrictDouble {
 	}
 }
 
+// NewStrictDoubleWithTypeOf instantiates a new `StrictDouble`, using the
+// global fail handler and validating that any configured interaction matches
+// the specified type.
 func NewStrictDoubleWithTypeOf(value interface{}) *StrictDouble {
 	return &StrictDouble{
 		interactions:         []interaction{},
@@ -42,6 +51,9 @@ func newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator 
 	}
 }
 
+// Call performs a method call on the double. If a matching interaction is
+// found, its return values will be returned. If no configured interaction
+// matches, an error will be returned.
 func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface{}, error) {
 	for _, interaction := range d.interactions {
 		interactionReturnValues, interactionMatches := interaction.call(methodName, args)
