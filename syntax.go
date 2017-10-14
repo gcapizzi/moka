@@ -1,10 +1,10 @@
 package moka
 
-type failHandler func(message string, callerSkip ...int)
+type FailHandler func(message string, callerSkip ...int)
 
-var globalFailHandler failHandler
+var globalFailHandler FailHandler
 
-func RegisterDoublesFailHandler(failHandler failHandler) {
+func RegisterDoublesFailHandler(failHandler FailHandler) {
 	globalFailHandler = failHandler
 }
 

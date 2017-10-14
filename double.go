@@ -15,7 +15,7 @@ type Double interface {
 type StrictDouble struct {
 	interactions         []interaction
 	interactionValidator interactionValidator
-	failHandler          failHandler
+	failHandler          FailHandler
 }
 
 func NewStrictDouble() *StrictDouble {
@@ -34,7 +34,7 @@ func NewStrictDoubleWithTypeOf(value interface{}) *StrictDouble {
 	}
 }
 
-func newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator interactionValidator, failHandler failHandler) *StrictDouble {
+func newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator interactionValidator, failHandler FailHandler) *StrictDouble {
 	return &StrictDouble{
 		interactions:         []interaction{},
 		interactionValidator: interactionValidator,
