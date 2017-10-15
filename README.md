@@ -7,8 +7,12 @@
 <p align="center">
   <strong>A Go mocking framework.</strong>
   <br />
-  <a href="https://godoc.org/github.com/gcapizzi/moka"><img alt="GoDOc" src="https://godoc.org/github.com/gcapizzi/moka?status.svg" /></a>
-  <a href="https://travis-ci.org/gcapizzi/moka"><img alt="TravisCI" src="https://travis-ci.org/gcapizzi/moka.svg?branch=master" /></a>
+  <a href="https://godoc.org/github.com/gcapizzi/moka">
+    <img alt="GoDOc" src="https://godoc.org/github.com/gcapizzi/moka?status.svg" />
+  </a>
+  <a href="https://travis-ci.org/gcapizzi/moka">
+    <img alt="TravisCI" src="https://travis-ci.org/gcapizzi/moka.svg?branch=master" />
+  </a>
 </p>
 
 <strong>Moka</strong> is a mocking framework for the [Go programming
