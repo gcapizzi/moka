@@ -31,7 +31,7 @@ var _ = Describe("StrictDouble", func() {
 	})
 
 	JustBeforeEach(func() {
-		double = newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator, testFailHandler)
+		double = newStrictDoubleWithInteractionValidatorAndFailHandler(newFakeInteractionValidator(nil), testFailHandler)
 	})
 
 	Describe("addInteraction", func() {
@@ -86,10 +86,6 @@ var _ = Describe("StrictDouble", func() {
 
 		var returnValues []interface{}
 		var err error
-
-		BeforeEach(func() {
-			interactionValidator = newFakeInteractionValidator(nil)
-		})
 
 		JustBeforeEach(func() {
 			double.addInteraction(firstInteraction)
