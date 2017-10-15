@@ -27,11 +27,12 @@ var _ = Describe("StrictDouble", func() {
 	var double *StrictDouble
 
 	BeforeEach(func() {
+		interactionValidator = newFakeInteractionValidator(nil)
 		resetTestFail()
 	})
 
 	JustBeforeEach(func() {
-		double = newStrictDoubleWithInteractionValidatorAndFailHandler(newFakeInteractionValidator(nil), testFailHandler)
+		double = newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator, testFailHandler)
 	})
 
 	Describe("addInteraction", func() {
