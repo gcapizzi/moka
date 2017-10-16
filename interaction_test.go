@@ -25,19 +25,19 @@ var _ = Describe("Interaction", func() {
 			var returnValues []interface{}
 
 			Context("when both the method name and the args match", func() {
-				BeforeEach(func() {
+				JustBeforeEach(func() {
 					returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"life", "universe", "everything"})
 				})
 
-				It("matches and returns it return values", func() {
+				It("matches and returns its return values", func() {
 					Expect(returnValues).To(Equal([]interface{}{42, nil}))
 					Expect(matched).To(BeTrue())
 				})
 			})
 
 			Context("when the method name doesn't match", func() {
-				BeforeEach(func() {
-					returnValues, matched = interaction.call("domandaFondamentale", []interface{}{"life", "universe", "everything"})
+				JustBeforeEach(func() {
+					returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"life", "universe", "everything"})
 				})
 
 				It("doesn't match and returns nil", func() {
@@ -47,7 +47,7 @@ var _ = Describe("Interaction", func() {
 			})
 
 			Context("when the arguments don't match", func() {
-				BeforeEach(func() {
+				JustBeforeEach(func() {
 					returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"vita", "universo", "tutto quanto"})
 				})
 
@@ -58,8 +58,8 @@ var _ = Describe("Interaction", func() {
 			})
 
 			Context("when both method name and the arguments don't match", func() {
-				BeforeEach(func() {
-					returnValues, matched = interaction.call("domandaFondamentale", []interface{}{"vita", "universo", "tutto quanto"})
+				JustBeforeEach(func() {
+					returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"vita", "universo", "tutto quanto"})
 				})
 
 				It("doesn't match and returns nil", func() {
