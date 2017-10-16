@@ -25,25 +25,29 @@ type StrictDouble struct {
 // NewStrictDouble instantiates a new `StrictDouble`, using the global fail
 // handler and no validation on the configured interactions.
 func NewStrictDouble() *StrictDouble {
-	return &StrictDouble{
-		interactions:         []interaction{},
-		interactionValidator: newNullInteractionValidator(),
-		failHandler:          globalFailHandler,
-	}
+	return newStrictDoubleWithInteractionValidatorAndFailHandler(
+		newNullInteractionValidator(),
+		globalFailHandler,
+	)
 }
 
 // NewStrictDoubleWithTypeOf instantiates a new `StrictDouble`, using the
 // global fail handler and validating that any configured interaction matches
 // the specified type.
 func NewStrictDoubleWithTypeOf(value interface{}) *StrictDouble {
-	return &StrictDouble{
-		interactions:         []interaction{},
-		interactionValidator: newTypeInteractionValidator(reflect.TypeOf(value)),
-		failHandler:          globalFailHandler,
-	}
+	return newStrictDoubleWithInteractionValidatorAndFailHandler(
+		newTypeInteractionValidator(reflect.TypeOf(value)),
+		globalFailHandler,
+	)
 }
 
 func newStrictDoubleWithInteractionValidatorAndFailHandler(interactionValidator interactionValidator, failHandler FailHandler) *StrictDouble {
+	if failHandler == nil {
+		panic("You are trying to instantiate a double, but Moka's fail handler is nil.\n" +
+			"If you're using Ginkgo, make sure you instantiate your doubles in a BeforeEach(), JustBeforeEach() or It() block.\n" +
+			"Alternatively, you may have forgotten to register a fail handler with RegisterDoublesFailHandler().")
+	}
+
 	return &StrictDouble{
 		interactions:         []interaction{},
 		interactionValidator: interactionValidator,
