@@ -45,7 +45,7 @@ var _ = Describe("Moka", func() {
 	It("supports expecting a method call on a double", func() {
 		ExpectDouble(collaborator).To(ReceiveCallTo("Command").With("arg").AndReturn("result", nil))
 
-		Expect(failHandlerCalled).To(BeFalse())
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 
 		result, _ := subject.DelegateCommand("arg")
 
@@ -59,7 +59,7 @@ var _ = Describe("Moka", func() {
 	It("supports allowing a method call on a double with variadic args", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("VariadicQuery").With([]string{"arg1", "arg2", "arg3"}).AndReturn("result"))
 
-		Expect(failHandlerCalled).To(BeFalse())
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 
 		result := subject.DelegateVariadicQuery("arg1", "arg2", "arg3")
 
