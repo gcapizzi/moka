@@ -11,7 +11,6 @@ import (
 
 func TestMoka(t *testing.T) {
 	RegisterFailHandler(Fail)
-	RegisterDoublesFailHandler(Fail)
 	RunSpecs(t, "Moka Suite")
 }
 
