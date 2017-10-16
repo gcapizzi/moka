@@ -23,7 +23,7 @@ func newAllowedInteraction(methodName string, args []interface{}, returnValues [
 
 func (i allowedInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
 	methodNamesAreEqual := i.methodName == methodName
-	argsAreEqual := reflect.DeepEqual(i.args, args)
+	argsAreEqual := i.args == nil || reflect.DeepEqual(i.args, args)
 
 	if methodNamesAreEqual && argsAreEqual {
 		return i.returnValues, true
@@ -47,32 +47,34 @@ func (i allowedInteraction) checkType(t reflect.Type) error {
 		return fmt.Errorf("Invalid interaction: type '%s' has no method '%s'", t.Name(), i.methodName)
 	}
 
-	expectedArgTypes := methodArgTypes(t, method)
+	if i.args != nil {
+		expectedArgTypes := methodArgTypes(t, method)
 
-	expectedNumberOfArgs := len(expectedArgTypes)
-	numberOfArgs := len(i.args)
-	if expectedNumberOfArgs != numberOfArgs {
-		return fmt.Errorf(
-			"Invalid interaction: method '%s.%s' takes %d arguments, %d specified",
-			t.Name(),
-			method.Name,
-			expectedNumberOfArgs,
-			numberOfArgs,
-		)
-	}
-
-	for i, arg := range i.args {
-		argType := reflect.TypeOf(arg)
-		expectedType := expectedArgTypes[i]
-		if !assignable(argType, expectedType) {
+		expectedNumberOfArgs := len(expectedArgTypes)
+		numberOfArgs := len(i.args)
+		if expectedNumberOfArgs != numberOfArgs {
 			return fmt.Errorf(
-				"Invalid interaction: type of argument %d of method '%s.%s' is '%s', '%s' given",
-				i+1,
+				"Invalid interaction: method '%s.%s' takes %d arguments, %d specified",
 				t.Name(),
 				method.Name,
-				typeString(expectedType),
-				typeString(argType),
+				expectedNumberOfArgs,
+				numberOfArgs,
 			)
+		}
+
+		for i, arg := range i.args {
+			argType := reflect.TypeOf(arg)
+			expectedType := expectedArgTypes[i]
+			if !assignable(argType, expectedType) {
+				return fmt.Errorf(
+					"Invalid interaction: type of argument %d of method '%s.%s' is '%s', '%s' given",
+					i+1,
+					t.Name(),
+					method.Name,
+					typeString(expectedType),
+					typeString(argType),
+				)
+			}
 		}
 	}
 

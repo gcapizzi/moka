@@ -67,6 +67,38 @@ var _ = Describe("Interaction", func() {
 					Expect(matched).To(BeFalse())
 				})
 			})
+
+			Context("when no args are specified", func() {
+				BeforeEach(func() {
+					interaction = newAllowedInteraction(
+						"UltimateQuestion",
+						nil,
+						[]interface{}{42, nil},
+					)
+				})
+
+				Context("when the method name matches", func() {
+					JustBeforeEach(func() {
+						returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"anything"})
+					})
+
+					It("matches and returns its return values", func() {
+						Expect(returnValues).To(Equal([]interface{}{42, nil}))
+						Expect(matched).To(BeTrue())
+					})
+				})
+
+				Context("when the method name doesn't match", func() {
+					JustBeforeEach(func() {
+						returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"anything"})
+					})
+
+					It("doesn't match and returns nil", func() {
+						Expect(returnValues).To(BeNil())
+						Expect(matched).To(BeFalse())
+					})
+				})
+			})
 		})
 
 		Describe("Verify", func() {
@@ -212,6 +244,56 @@ var _ = Describe("Interaction", func() {
 
 			TestCheckType(reflect.TypeOf((*deepThought)(nil)).Elem())
 			TestCheckType(reflect.TypeOf(myDeepThought{}))
+		})
+
+		Context("when no arguments are specified", func() {
+			var matched bool
+			var returnValues []interface{}
+			var checkTypeError error
+
+			BeforeEach(func() {
+				interaction = newAllowedInteraction(
+					"UltimateQuestion",
+					nil,
+					[]interface{}{42, nil},
+				)
+			})
+
+			Describe("Call", func() {
+				Context("when the method name matches", func() {
+					JustBeforeEach(func() {
+						returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"anything"})
+					})
+
+					It("matches and returns its return values", func() {
+						Expect(returnValues).To(Equal([]interface{}{42, nil}))
+						Expect(matched).To(BeTrue())
+					})
+				})
+
+				Context("when the method name doesn't match", func() {
+					JustBeforeEach(func() {
+						returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"anything"})
+					})
+
+					It("doesn't match and returns nil", func() {
+						Expect(returnValues).To(BeNil())
+						Expect(matched).To(BeFalse())
+					})
+				})
+			})
+
+			Describe("CheckType", func() {
+				JustBeforeEach(func() {
+					checkTypeError = interaction.checkType(reflect.TypeOf(myDeepThought{}))
+				})
+
+				Context("when the method is defined", func() {
+					It("succeeds", func() {
+						Expect(checkTypeError).NotTo(HaveOccurred())
+					})
+				})
+			})
 		})
 	})
 
