@@ -300,7 +300,7 @@ Moka treats variadic arguments are regular slice arguments. This means that:
 
 * You should not unpack (as in `SomeFunction(args...)`) the slice containing
   the variadic values when passing it to `Call`.
-* You should use slices in places of variadic arguments when allowing or
+* You should use slices in place of variadic arguments when allowing or
   expecting method calls.
 
 For example, given a `Calculator` interface:
