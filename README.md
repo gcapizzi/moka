@@ -13,6 +13,9 @@
   <a href="https://travis-ci.org/gcapizzi/moka">
     <img alt="TravisCI" src="https://travis-ci.org/gcapizzi/moka.svg?branch=master" />
   </a>
+  <a href="https://goreportcard.com/report/github.com/gcapizzi/moka">
+    <img alt="Go Report Card" src="https://goreportcard.com/badge/github.com/gcapizzi/moka" />
+  </a>
 </p>
 
 <strong>Moka</strong> is a mocking framework for the [Go programming
