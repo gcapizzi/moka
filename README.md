@@ -218,7 +218,7 @@ will never happen!
 
 To avoid this kind of problems, Moka provides _types
 doubles_, which are associated with a type and will make sure that any
-configured interactions actually matches with the type.
+configured interactions actually match with the type.
 
 To instantiate a typed double, use the `NewStrictDoubleWithTypeOf` constructor:
 
