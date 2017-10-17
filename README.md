@@ -291,3 +291,38 @@ Describe("Score", func() {
 
 We use `ExpectDouble` to expect method calls on a double, and `VerifyCalls`
 to verify that the calls have actually been made.
+
+## Gotchas
+
+### Variadic Methods
+
+Moka treats variadic arguments are regular slice arguments. This means that:
+
+* You should not unpack (_"splat"_) the slice containing the variadic values
+  when passing it to `Call`.
+* You should use slices in places of variadic arguments when allowing or
+  expecting method calls.
+
+For example, given a `Calculator` interface:
+
+```go
+type Calculator interface {
+	Add(numbers ...int) int
+}
+```
+
+This is how you should delegate `Add` to `Call` in the double implementation:
+
+```go
+func (d CalculatorDouble) Add(numbers ...int) int {
+	returnValues, _ := d.Call("Add", numbers)
+
+	// ...
+}
+```
+
+And this is how you should allow a call to `Add`:
+
+```go
+AllowDouble(calculator).To(ReceiveCallTo("Add").With([]int{1, 2, 3}).AndReturn(6))
+```
