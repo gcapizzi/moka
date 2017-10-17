@@ -298,8 +298,8 @@ to verify that the calls have actually been made.
 
 Moka treats variadic arguments are regular slice arguments. This means that:
 
-* You should not unpack (_"splat"_) the slice containing the variadic values
-  when passing it to `Call`.
+* You should not unpack (as in `SomeFunction(args...)`) the slice containing
+  the variadic values when passing it to `Call`.
 * You should use slices in places of variadic arguments when allowing or
   expecting method calls.
 
