@@ -289,5 +289,5 @@ Describe("Score", func() {
 })
 ```
 
-We use `ExpectDouble()` to expect method calls on a double, and `VerifyCalls`
+We use `ExpectDouble` to expect method calls on a double, and `VerifyCalls`
 to verify that the calls have actually been made.
