@@ -219,9 +219,9 @@ Describe("Score", func() {
 The `Die` interface has no method called `Cast`, so our configured interaction
 will never happen!
 
-To avoid this kind of problems, Moka provides _types
+To avoid this kind of problems, Moka provides _typed
 doubles_, which are associated with a type and will make sure that any
-configured interactions actually match with the type.
+configured interaction actually matches the type.
 
 To instantiate a typed double, use the `NewStrictDoubleWithTypeOf` constructor:
 
