@@ -56,7 +56,7 @@ var _ = Describe("Moka", func() {
 		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 	})
 
-	It("supports allowing a method call on a double with any args", func() {
+	It("supports allowing a method call on a double without specifying any args", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("Query").AndReturn("result"))
 
 		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
