@@ -71,7 +71,7 @@ Here is the type for the Moka doubles fail handler:
 type FailHandler func(message string, callerSkip ...int)
 ```
 
-This type is modeled to match Ginkgo's `Fail` function. To use Moka with the
+This type is modelled to match Ginkgo's `Fail` function. To use Moka with the
 `testing` package, just provide a doubles fail handler that makes the test
 fail!
 
