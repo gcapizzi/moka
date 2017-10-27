@@ -295,6 +295,34 @@ Describe("Score", func() {
 We use `ExpectDouble` to expect method calls on a double, and `VerifyCalls`
 to verify that the calls have actually been made.
 
+## How does Moka compare to the other Go mocking frameworks?
+
+There are a lot of mocking libraries for Go out there, so why build a new one?
+Compared to those libraries, Moka offers:
+
+* A very readable syntax, inspired by RSpec.
+* A model that naturally supports stubbing or mocking different method calls
+  with different arguments and return values, without the need to enforce any
+  order, which would add unnecessary coupling between your tests and your
+  implementation.
+* A relatively straightforward way to declare double types, without the need for
+  a generator. We still plan to introduce a generator to make things even
+  easier.
+* Strict doubles that will make your test fail on any unexpected interaction,
+  instead of loose doubles that will return zero values and lead to confusing
+  failures.
+
+On the other hand, Moka currently lacks:
+
+* Compile-time type safety: in order to offer such a flexible and readable
+  syntax, Moka cannot use the Go type system to detect invalid stub/mock
+  declarations at compile-time. When using typed doubles, Moka will instead
+  detect those errors at runtime and fail the test.
+* Support for custom behaviour in stub/mock declarations: this features is in
+  the works and will allow to declare stubs/mocks using anonymous functions.
+- Support for argument matchers: will be implemented soon.
+- Support for enforced order of interactions: will be implemented soon.
+
 ## Gotchas
 
 ### Variadic Methods
