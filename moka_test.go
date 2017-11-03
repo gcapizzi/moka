@@ -67,6 +67,17 @@ var _ = Describe("Moka", func() {
 		Expect(result).To(Equal("result"))
 	})
 
+	It("supports expecting a method call on a double without specifying any args or return values", func() {
+		ExpectDouble(collaborator).To(ReceiveCallTo("CommandWithNoReturnValues"))
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
+
+		subject.DelegateCommandWithNoReturnValues("arg")
+		VerifyCalls(collaborator)
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
+	})
+
 	It("supports allowing a method call on a double with variadic args", func() {
 		AllowDouble(collaborator).To(ReceiveCallTo("VariadicQuery").With([]string{"arg1", "arg2", "arg3"}).AndReturn("result"))
 
@@ -82,6 +93,7 @@ var _ = Describe("Moka", func() {
 type Collaborator interface {
 	Query(string) string
 	Command(string) (string, error)
+	CommandWithNoReturnValues(string)
 	VariadicQuery(...string) string
 }
 
@@ -114,6 +126,10 @@ func (d CollaboratorDouble) Command(arg string) (string, error) {
 	return returnedString, returnedError
 }
 
+func (d CollaboratorDouble) CommandWithNoReturnValues(arg string) {
+	d.Call("CommandWithNoReturnValues", arg)
+}
+
 func (d CollaboratorDouble) VariadicQuery(args ...string) string {
 	returnValues, err := d.Call("VariadicQuery", args)
 	if err != nil {
@@ -141,4 +157,8 @@ func (s Subject) DelegateCommand(arg string) (string, error) {
 
 func (s Subject) DelegateVariadicQuery(args ...string) string {
 	return s.collaborator.VariadicQuery(args...)
+}
+
+func (s Subject) DelegateCommandWithNoReturnValues(arg string) {
+	s.collaborator.CommandWithNoReturnValues(arg)
 }
