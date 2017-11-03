@@ -62,9 +62,30 @@ type InteractionBuilder interface {
 	build() interaction
 }
 
+// MethodInteractionBuilder allows to build interactions that are specific to a
+// method. It turns into more specific builders through the fluid interface
+// methods.
+type MethodInteractionBuilder struct {
+	methodName string
+}
+
 // ReceiveCallTo allows to specify the method name of the interaction.
-func ReceiveCallTo(methodName string) ArgsInteractionBuilder {
-	return ArgsInteractionBuilder{methodName: methodName}
+func ReceiveCallTo(methodName string) MethodInteractionBuilder {
+	return MethodInteractionBuilder{methodName: methodName}
+}
+
+// With allows to specify the expected arguments of the interaction.
+func (b MethodInteractionBuilder) With(args ...interface{}) ArgsInteractionBuilder {
+	return ArgsInteractionBuilder{methodName: b.methodName, args: args}
+}
+
+// AndReturn allows to specify the return value of the interaction.
+func (b MethodInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInteractionBuilder {
+	return ArgsInteractionBuilder{methodName: b.methodName, returnValues: returnValues}
+}
+
+func (b MethodInteractionBuilder) build() interaction {
+	return newAllowedInteraction(b.methodName, nil, nil)
 }
 
 // ArgsInteractionBuilder allows to build interactions that are defined by a
@@ -73,11 +94,6 @@ type ArgsInteractionBuilder struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
-}
-
-// With allows to specify the expected arguments of the interaction.
-func (b ArgsInteractionBuilder) With(args ...interface{}) ArgsInteractionBuilder {
-	return ArgsInteractionBuilder{methodName: b.methodName, args: args, returnValues: b.returnValues}
 }
 
 // AndReturn allows to specify the return value of the interaction.
