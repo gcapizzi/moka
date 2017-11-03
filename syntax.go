@@ -56,28 +56,35 @@ func VerifyCalls(double Double) {
 	double.verifyInteractions()
 }
 
-// InteractionBuilder provides a fluid API to build interactions.
-type InteractionBuilder struct {
+// InteractionBuilder provides a fluid interface to build interactions to
+// configure on a `Double`
+type InteractionBuilder interface {
+	build() interaction
+}
+
+// ReceiveCallTo allows to specify the method name of the interaction.
+func ReceiveCallTo(methodName string) ArgsInteractionBuilder {
+	return ArgsInteractionBuilder{methodName: methodName}
+}
+
+// ArgsInteractionBuilder allows to build interactions that are defined by a
+// method name, a list of arguments and a list of return values
+type ArgsInteractionBuilder struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
-// ReceiveCallTo allows to specify the method name of the interaction.
-func ReceiveCallTo(methodName string) InteractionBuilder {
-	return InteractionBuilder{methodName: methodName}
-}
-
 // With allows to specify the expected arguments of the interaction.
-func (b InteractionBuilder) With(args ...interface{}) InteractionBuilder {
-	return InteractionBuilder{methodName: b.methodName, args: args, returnValues: b.returnValues}
+func (b ArgsInteractionBuilder) With(args ...interface{}) ArgsInteractionBuilder {
+	return ArgsInteractionBuilder{methodName: b.methodName, args: args, returnValues: b.returnValues}
 }
 
 // AndReturn allows to specify the return value of the interaction.
-func (b InteractionBuilder) AndReturn(returnValues ...interface{}) InteractionBuilder {
-	return InteractionBuilder{methodName: b.methodName, args: b.args, returnValues: returnValues}
+func (b ArgsInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInteractionBuilder {
+	return ArgsInteractionBuilder{methodName: b.methodName, args: b.args, returnValues: returnValues}
 }
 
-func (b InteractionBuilder) build() interaction {
+func (b ArgsInteractionBuilder) build() interaction {
 	return newAllowedInteraction(b.methodName, b.args, b.returnValues)
 }
