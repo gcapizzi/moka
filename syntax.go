@@ -28,7 +28,7 @@ func AllowDouble(double Double) AllowanceTarget {
 }
 
 // To configures the interaction built by the provided `InteractionBuilder` on
-// the wrapper `Double`.
+// the wrapped `Double`.
 func (t AllowanceTarget) To(interactionBuilder InteractionBuilder) {
 	t.double.addInteraction(interactionBuilder.build())
 }
@@ -45,7 +45,7 @@ func ExpectDouble(double Double) ExpectationTarget {
 }
 
 // To configures the interaction built by the provided `InteractionBuilder` on
-// the wrapper `Double`.
+// the wrapped `Double`.
 func (t ExpectationTarget) To(interactionBuilder InteractionBuilder) {
 	t.double.addInteraction(newExpectedInteraction(interactionBuilder.build()))
 }
