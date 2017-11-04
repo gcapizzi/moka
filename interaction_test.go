@@ -9,11 +9,11 @@ import (
 )
 
 var _ = Describe("interaction", func() {
-	Describe("allowedInteraction", func() {
+	Describe("argsInteraction", func() {
 		var interaction interaction
 
 		BeforeEach(func() {
-			interaction = newAllowedInteraction(
+			interaction = newArgsInteraction(
 				"UltimateQuestion",
 				[]interface{}{"life", "universe", "everything"},
 				[]interface{}{42, nil},
@@ -70,7 +70,7 @@ var _ = Describe("interaction", func() {
 
 			Context("when no args are specified", func() {
 				BeforeEach(func() {
-					interaction = newAllowedInteraction(
+					interaction = newArgsInteraction(
 						"UltimateQuestion",
 						nil,
 						[]interface{}{42, nil},
@@ -117,7 +117,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the method is defined and all types match", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", "everything"},
 							[]interface{}{42, nil},
@@ -131,7 +131,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the method is not defined", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"WorstQuestion",
 							[]interface{}{"life", "universe", "everything"},
 							[]interface{}{42, nil},
@@ -145,7 +145,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the number of arguments doesn't match", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe"},
 							[]interface{}{42, nil},
@@ -159,7 +159,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the type of some arguments doesn't match", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", 0},
 							[]interface{}{42, nil},
@@ -173,7 +173,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when nil is specified for a non-nillable type argument", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", nil},
 							[]interface{}{42, nil},
@@ -187,7 +187,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when nil is specified for a nillable type argument", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestionWithSlice",
 							[]interface{}{nil},
 							[]interface{}{42, nil},
@@ -201,7 +201,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the number of return values doesn't match", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", "everything"},
 							[]interface{}{42},
@@ -215,7 +215,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when the type of return values don't match", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", "everything"},
 							[]interface{}{"forty-two", nil},
@@ -229,7 +229,7 @@ var _ = Describe("interaction", func() {
 
 				Context("when nil is specified for a non-nillable type return value", func() {
 					BeforeEach(func() {
-						interaction = newAllowedInteraction(
+						interaction = newArgsInteraction(
 							"UltimateQuestion",
 							[]interface{}{"life", "universe", "everything"},
 							[]interface{}{nil, nil},
@@ -252,7 +252,7 @@ var _ = Describe("interaction", func() {
 			var checkTypeError error
 
 			BeforeEach(func() {
-				interaction = newAllowedInteraction(
+				interaction = newArgsInteraction(
 					"UltimateQuestion",
 					nil,
 					[]interface{}{42, nil},

@@ -85,7 +85,7 @@ func (b MethodInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInt
 }
 
 func (b MethodInteractionBuilder) build() interaction {
-	return newAllowedInteraction(b.methodName, nil, nil)
+	return newArgsInteraction(b.methodName, nil, nil)
 }
 
 // ArgsInteractionBuilder allows to build interactions that are defined by a
@@ -102,5 +102,5 @@ func (b ArgsInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInter
 }
 
 func (b ArgsInteractionBuilder) build() interaction {
-	return newAllowedInteraction(b.methodName, b.args, b.returnValues)
+	return newArgsInteraction(b.methodName, b.args, b.returnValues)
 }

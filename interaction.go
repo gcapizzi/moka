@@ -11,17 +11,17 @@ type interaction interface {
 	checkType(t reflect.Type) error
 }
 
-type allowedInteraction struct {
+type argsInteraction struct {
 	methodName   string
 	args         []interface{}
 	returnValues []interface{}
 }
 
-func newAllowedInteraction(methodName string, args []interface{}, returnValues []interface{}) allowedInteraction {
-	return allowedInteraction{methodName: methodName, args: args, returnValues: returnValues}
+func newArgsInteraction(methodName string, args []interface{}, returnValues []interface{}) argsInteraction {
+	return argsInteraction{methodName: methodName, args: args, returnValues: returnValues}
 }
 
-func (i allowedInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
+func (i argsInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
 	methodNamesAreEqual := i.methodName == methodName
 	argsAreEqual := i.args == nil || reflect.DeepEqual(i.args, args)
 
@@ -32,15 +32,15 @@ func (i allowedInteraction) call(methodName string, args []interface{}) ([]inter
 	return nil, false
 }
 
-func (i allowedInteraction) verify() error {
+func (i argsInteraction) verify() error {
 	return nil
 }
 
-func (i allowedInteraction) String() string {
+func (i argsInteraction) String() string {
 	return formatMethodCall(i.methodName, i.args)
 }
 
-func (i allowedInteraction) checkType(t reflect.Type) error {
+func (i argsInteraction) checkType(t reflect.Type) error {
 	method, methodExists := t.MethodByName(i.methodName)
 
 	if !methodExists {
