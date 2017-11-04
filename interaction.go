@@ -80,7 +80,7 @@ func (i argsInteraction) checkType(t reflect.Type) error {
 
 	expectedNumberOfReturnValues := method.Type.NumOut()
 	numberOfReturnValues := len(i.returnValues)
-	if method.Type.NumOut() != len(i.returnValues) {
+	if numberOfReturnValues != expectedNumberOfReturnValues {
 		return fmt.Errorf(
 			"Invalid interaction: method '%s.%s' returns %d values, %d specified",
 			t.Name(),
