@@ -295,6 +295,30 @@ Describe("Score", func() {
 We use `ExpectDouble` to expect method calls on a double, and `VerifyCalls`
 to verify that the calls have actually been made.
 
+## Custom interaction behaviour
+
+If you need to specify a custom behaviour for your double interactions, of need
+to perform assertions on the arguments, you can specify a body for the
+interaction using `AndDo`:
+
+```go
+Describe("Score", func() {
+	It("returns the sum of three die rolls", func() {
+		AllowDouble(die).To(ReceiveCallTo("Roll").AndDo(func(times int) []int {
+			Expect(times).To(BeNumerically(">", 0))
+
+			rolls := []int{}
+			for i := 0; i < times; i++ {
+				rolls = append(rolls, i+1)
+			}
+			return rolls
+		}))
+
+		Expect(game.Score()).To(Equal(6))
+	})
+})
+```
+
 ## How does Moka compare to the other Go mocking frameworks?
 
 There are a lot of mocking libraries for Go out there, so why build a new one?
@@ -318,10 +342,8 @@ On the other hand, Moka currently lacks:
   syntax, Moka cannot use the Go type system to detect invalid stub/mock
   declarations at compile-time. When using typed doubles, Moka will instead
   detect those errors at runtime and fail the test.
-* Support for custom behaviour in stub/mock declarations: this features is in
-  the works and will allow to declare stubs/mocks using anonymous functions.
-- Support for argument matchers: will be implemented soon.
-- Support for enforced order of interactions: will be implemented soon.
+* Support for argument matchers: will be implemented soon.
+* Support for enforced order of interactions: will be implemented soon.
 
 ## Gotchas
 
