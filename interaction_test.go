@@ -12,17 +12,17 @@ var _ = Describe("interaction", func() {
 	Describe("argsInteraction", func() {
 		var interaction interaction
 
-		BeforeEach(func() {
-			interaction = newArgsInteraction(
-				"UltimateQuestion",
-				[]interface{}{"life", "universe", "everything"},
-				[]interface{}{42, nil},
-			)
-		})
-
 		Describe("call", func() {
 			var matched bool
 			var returnValues []interface{}
+
+			BeforeEach(func() {
+				interaction = newArgsInteraction(
+					"UltimateQuestion",
+					[]interface{}{"life", "universe", "everything"},
+					[]interface{}{42, nil},
+				)
+			})
 
 			Context("when both the method name and the args match", func() {
 				JustBeforeEach(func() {
@@ -70,6 +70,10 @@ var _ = Describe("interaction", func() {
 		})
 
 		Describe("verify", func() {
+			BeforeEach(func() {
+				interaction = newArgsInteraction("", nil, nil)
+			})
+
 			It("does nothing and always returns nil", func() {
 				Expect(interaction.verify()).To(BeNil())
 			})
