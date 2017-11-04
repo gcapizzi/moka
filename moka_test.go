@@ -88,6 +88,23 @@ var _ = Describe("Moka", func() {
 		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
 		Expect(result).To(Equal("result"))
 	})
+
+	It("supports allowing a method call on a double with a custom behaviour", func() {
+		AllowDouble(collaborator).To(ReceiveCallTo("Query").AndDo(func(arg string) string {
+			if arg == "arg" {
+				return "result"
+			}
+
+			return ""
+		}))
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
+
+		result := subject.DelegateQuery("arg")
+
+		Expect(failHandlerCalled).To(BeFalse(), failHandlerMessage)
+		Expect(result).To(Equal("result"))
+	})
 })
 
 type Collaborator interface {

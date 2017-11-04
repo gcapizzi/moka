@@ -108,6 +108,51 @@ func (i argsInteraction) checkType(t reflect.Type) error {
 	return nil
 }
 
+type bodyInteraction struct {
+	methodName string
+	body       interface{}
+}
+
+func newBodyInteraction(methodName string, body interface{}) bodyInteraction {
+	return bodyInteraction{methodName: methodName, body: body}
+}
+
+func (i bodyInteraction) call(methodName string, args []interface{}) ([]interface{}, bool) {
+	if methodName == i.methodName {
+		bodyAsValue := reflect.ValueOf(i.body)
+		argsAsValues := interfacesToValues(args)
+		returnValuesAsValues := bodyAsValue.Call(argsAsValues)
+		returnValuesAsInterfaces := valuesToInterfaces(returnValuesAsValues)
+		return returnValuesAsInterfaces, true
+	}
+
+	return nil, false
+}
+
+func interfacesToValues(interfaces []interface{}) []reflect.Value {
+	values := []reflect.Value{}
+	for _, i := range interfaces {
+		values = append(values, reflect.ValueOf(i))
+	}
+	return values
+}
+
+func valuesToInterfaces(values []reflect.Value) []interface{} {
+	interfaces := []interface{}{}
+	for _, v := range values {
+		interfaces = append(interfaces, v.Interface())
+	}
+	return interfaces
+}
+
+func (i bodyInteraction) verify() error {
+	return nil
+}
+
+func (i bodyInteraction) checkType(t reflect.Type) error {
+	return nil
+}
+
 type expectedInteraction struct {
 	interaction interaction
 	called      bool

@@ -84,6 +84,11 @@ func (b MethodInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInt
 	return ArgsInteractionBuilder{methodName: b.methodName, returnValues: returnValues}
 }
 
+// AndDo allows to specify a custom body to be executed by the interaction.
+func (b MethodInteractionBuilder) AndDo(body interface{}) BodyInteractionBuilder {
+	return BodyInteractionBuilder{methodName: b.methodName, body: body}
+}
+
 func (b MethodInteractionBuilder) build() interaction {
 	return newArgsInteraction(b.methodName, nil, nil)
 }
@@ -103,4 +108,15 @@ func (b ArgsInteractionBuilder) AndReturn(returnValues ...interface{}) ArgsInter
 
 func (b ArgsInteractionBuilder) build() interaction {
 	return newArgsInteraction(b.methodName, b.args, b.returnValues)
+}
+
+// BodyInteractionBuilder allows to build interactions that are defined by a
+// method name and a custom body
+type BodyInteractionBuilder struct {
+	methodName string
+	body       interface{}
+}
+
+func (b BodyInteractionBuilder) build() interaction {
+	return newBodyInteraction(b.methodName, b.body)
 }

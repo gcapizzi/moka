@@ -1,6 +1,7 @@
 package moka
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 
@@ -305,6 +306,56 @@ var _ = Describe("interaction", func() {
 				Expect(returnValues).To(BeNil())
 				Expect(matched).To(Equal(false))
 				Expect(expectedInteraction.verify()).To(MatchError("Expected interaction: <the-interaction-string-representation>"))
+			})
+		})
+	})
+
+	Describe("bodyInteraction", func() {
+		var interaction interaction
+
+		BeforeEach(func() {
+			interaction = newBodyInteraction(
+				"UltimateQuestion",
+				func(topicOne, topicTwo, topicThree string) (int, error) {
+					if topicOne == "life" && topicTwo == "universe" && topicThree == "everything" {
+						return 42, nil
+					}
+
+					return 0, errors.New("NOPE")
+				},
+			)
+		})
+
+		Describe("call", func() {
+			var matched bool
+			var returnValues []interface{}
+
+			Context("when the method name matches", func() {
+				JustBeforeEach(func() {
+					returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"life", "universe", "everything"})
+				})
+
+				It("matches and returns the return values from the body", func() {
+					Expect(returnValues).To(Equal([]interface{}{42, nil}))
+					Expect(matched).To(BeTrue())
+				})
+			})
+
+			Context("when the method name doesn't match", func() {
+				JustBeforeEach(func() {
+					returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"life", "universe", "everything"})
+				})
+
+				It("matches and returns the return values from the body", func() {
+					Expect(returnValues).To(BeNil())
+					Expect(matched).To(BeFalse())
+				})
+			})
+		})
+
+		Describe("verify", func() {
+			It("does nothing and returns nil", func() {
+				Expect(interaction.verify()).To(BeNil())
 			})
 		})
 	})
