@@ -150,6 +150,70 @@ func (i bodyInteraction) verify() error {
 }
 
 func (i bodyInteraction) checkType(t reflect.Type) error {
+	method, methodExists := t.MethodByName(i.methodName)
+
+	if !methodExists {
+		return fmt.Errorf("Invalid interaction: type '%s' has no method '%s'", t.Name(), i.methodName)
+	}
+
+	bodyType := reflect.TypeOf(i.body)
+	expectedArgTypes := methodArgTypes(t, method)
+
+	expectedNumberOfArgs := len(expectedArgTypes)
+	numberOfArgs := bodyType.NumIn()
+	if expectedNumberOfArgs != numberOfArgs {
+		return fmt.Errorf(
+			"Invalid interaction: method '%s.%s' takes %d arguments, provided func takes %d",
+			t.Name(),
+			method.Name,
+			expectedNumberOfArgs,
+			numberOfArgs,
+		)
+	}
+
+	for i, expectedType := range expectedArgTypes {
+		argType := bodyType.In(i)
+		if argType != expectedType {
+			return fmt.Errorf(
+				"Invalid interaction: type of argument %d of method '%s.%s' is '%s', type of argument %d of provided func is '%s'",
+				i+1,
+				t.Name(),
+				method.Name,
+				typeString(expectedType),
+				i+1,
+				typeString(argType),
+			)
+		}
+	}
+
+	expectedNumberOfReturnValues := method.Type.NumOut()
+	numberOfReturnValues := bodyType.NumOut()
+	if numberOfReturnValues != expectedNumberOfReturnValues {
+		return fmt.Errorf(
+			"Invalid interaction: method '%s.%s' returns %d values, provided func returns %d",
+			t.Name(),
+			method.Name,
+			expectedNumberOfReturnValues,
+			numberOfReturnValues,
+		)
+	}
+
+	for i := 0; i < method.Type.NumOut(); i++ {
+		returnValueType := bodyType.Out(i)
+		expectedType := method.Type.Out(i)
+		if returnValueType != expectedType {
+			return fmt.Errorf(
+				"Invalid interaction: type of return value %d of method '%s.%s' is '%s', type of return value %d of provided func is '%s'",
+				i+1,
+				t.Name(),
+				method.Name,
+				typeString(expectedType),
+				i+1,
+				typeString(returnValueType),
+			)
+		}
+	}
+
 	return nil
 }
 

@@ -358,6 +358,97 @@ var _ = Describe("interaction", func() {
 				Expect(interaction.verify()).To(BeNil())
 			})
 		})
+
+		Describe("checkType", func() {
+			var TestCheckType = func(t reflect.Type) {
+				var checkTypeError error
+
+				JustBeforeEach(func() {
+					checkTypeError = interaction.checkType(t)
+				})
+
+				Context("when the method is defined and all types match", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"UltimateQuestion",
+							func(topicOne, topicTwo, topicThree string) (int, error) { return 0, nil },
+						)
+					})
+
+					It("succeeds", func() {
+						Expect(checkTypeError).NotTo(HaveOccurred())
+					})
+				})
+
+				Context("when the method is not defined", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"WorstQuestion",
+							func(topicOne, topicTwo, topicThree string) (int, error) { return 0, nil },
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type '%s' has no method 'WorstQuestion'", t.Name())))
+					})
+				})
+
+				Context("when the number of arguments doesn't match", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"UltimateQuestion",
+							func(topicOne, topicTwo string) (int, error) { return 0, nil },
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: method '%s.UltimateQuestion' takes 3 arguments, provided func takes 2", t.Name())))
+					})
+				})
+
+				Context("when the argument types don't match", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"UltimateQuestion",
+							func(topicOne, topicTwo string, x interface{}) (int, error) { return 0, nil },
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of argument 3 of method '%s.UltimateQuestion' is 'string', type of argument 3 of provided func is 'interface {}'", t.Name())))
+					})
+				})
+
+				Context("when the number of return values doesn't match", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"UltimateQuestion",
+							func(topicOne, topicTwo, topicThree string) int { return 0 },
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: method '%s.UltimateQuestion' returns 2 values, provided func returns 1", t.Name())))
+					})
+				})
+
+				Context("when the return value types don't match", func() {
+					BeforeEach(func() {
+						interaction = newBodyInteraction(
+							"UltimateQuestion",
+							func(topicOne, topicTwo, topicThree string) (string, error) { return "", nil },
+						)
+					})
+
+					It("fails", func() {
+						Expect(checkTypeError).To(MatchError(fmt.Sprintf("Invalid interaction: type of return value 1 of method '%s.UltimateQuestion' is 'int', type of return value 1 of provided func is 'string'", t.Name())))
+					})
+				})
+			}
+
+			TestCheckType(reflect.TypeOf((*deepThought)(nil)).Elem())
+			TestCheckType(reflect.TypeOf(myDeepThought{}))
+		})
 	})
 })
 
