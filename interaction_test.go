@@ -67,38 +67,6 @@ var _ = Describe("interaction", func() {
 					Expect(matched).To(BeFalse())
 				})
 			})
-
-			Context("when no args are specified", func() {
-				BeforeEach(func() {
-					interaction = newArgsInteraction(
-						"UltimateQuestion",
-						nil,
-						[]interface{}{42, nil},
-					)
-				})
-
-				Context("when the method name matches", func() {
-					JustBeforeEach(func() {
-						returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"anything"})
-					})
-
-					It("matches and returns its return values", func() {
-						Expect(returnValues).To(Equal([]interface{}{42, nil}))
-						Expect(matched).To(BeTrue())
-					})
-				})
-
-				Context("when the method name doesn't match", func() {
-					JustBeforeEach(func() {
-						returnValues, matched = interaction.call("DomandaFondamentale", []interface{}{"anything"})
-					})
-
-					It("doesn't match and returns nil", func() {
-						Expect(returnValues).To(BeNil())
-						Expect(matched).To(BeFalse())
-					})
-				})
-			})
 		})
 
 		Describe("verify", func() {
