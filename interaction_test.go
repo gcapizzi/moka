@@ -8,8 +8,8 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-var _ = Describe("Interaction", func() {
-	Describe("AllowedInteraction", func() {
+var _ = Describe("interaction", func() {
+	Describe("allowedInteraction", func() {
 		var interaction interaction
 
 		BeforeEach(func() {
@@ -20,7 +20,7 @@ var _ = Describe("Interaction", func() {
 			)
 		})
 
-		Describe("Call", func() {
+		Describe("call", func() {
 			var matched bool
 			var returnValues []interface{}
 
@@ -101,13 +101,13 @@ var _ = Describe("Interaction", func() {
 			})
 		})
 
-		Describe("Verify", func() {
+		Describe("verify", func() {
 			It("does nothing and always returns nil", func() {
 				Expect(interaction.verify()).To(BeNil())
 			})
 		})
 
-		Describe("CheckType", func() {
+		Describe("checkType", func() {
 			var TestCheckType = func(t reflect.Type) {
 				var checkTypeError error
 
@@ -259,7 +259,7 @@ var _ = Describe("Interaction", func() {
 				)
 			})
 
-			Describe("Call", func() {
+			Describe("call", func() {
 				Context("when the method name matches", func() {
 					JustBeforeEach(func() {
 						returnValues, matched = interaction.call("UltimateQuestion", []interface{}{"anything"})
@@ -283,7 +283,7 @@ var _ = Describe("Interaction", func() {
 				})
 			})
 
-			Describe("CheckType", func() {
+			Describe("checkType", func() {
 				JustBeforeEach(func() {
 					checkTypeError = interaction.checkType(reflect.TypeOf(myDeepThought{}))
 				})
@@ -297,7 +297,7 @@ var _ = Describe("Interaction", func() {
 		})
 	})
 
-	Describe("ExpectedInteraction", func() {
+	Describe("expectedInteraction", func() {
 		var expectedMethodName = "UltimateQuestion"
 		var expectedArgs = []interface{}{"life", "universe", "everything"}
 
