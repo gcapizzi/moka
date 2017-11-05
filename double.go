@@ -67,7 +67,7 @@ func (d *StrictDouble) Call(methodName string, args ...interface{}) ([]interface
 	}
 
 	errorMessage := fmt.Sprintf("Unexpected interaction: %s", formatMethodCall(methodName, args))
-	d.failHandler(errorMessage)
+	d.fail(errorMessage)
 	return nil, errors.New(errorMessage)
 }
 
@@ -75,7 +75,7 @@ func (d *StrictDouble) addInteraction(interaction interaction) {
 	validationError := d.interactionValidator.validate(interaction)
 
 	if validationError != nil {
-		d.failHandler(validationError.Error())
+		d.fail(validationError.Error())
 		return
 	}
 
@@ -86,8 +86,12 @@ func (d *StrictDouble) verifyInteractions() {
 	for _, interaction := range d.interactions {
 		err := interaction.verify()
 		if err != nil {
-			d.failHandler(err.Error())
+			d.fail(err.Error())
 			return
 		}
 	}
+}
+
+func (d *StrictDouble) fail(message string) {
+	d.failHandler(message)
 }
