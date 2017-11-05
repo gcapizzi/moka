@@ -93,5 +93,5 @@ func (d *StrictDouble) verifyInteractions() {
 }
 
 func (d *StrictDouble) fail(message string) {
-	d.failHandler(message)
+	d.failHandler(message, 4)
 }
